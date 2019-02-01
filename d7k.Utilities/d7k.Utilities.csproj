@@ -75,12 +75,7 @@
     <Compile Include="Web\MimeTypes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="gulpfile.js" />
-    <Content Include="Tools.Publisher\gulpfile.js" />
-    <Content Include="Tools.Publisher\readme.txt" />
     <None Include="packages.config" />
-    <None Include="Tools.Publisher\gulp-nuget.config" />
-    <None Include="Tools.Publisher\package-example.json" />
     <None Include="Web\MimeTypes.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -88,9 +83,6 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="package.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
