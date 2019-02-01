@@ -229,7 +229,9 @@ namespace d7k.Dto.Tests
 			var validation = new ValidationRepository().Create<SaveLotDtoTemp>(null);
 			validation.RuleFor(x => x.FixDate).AddValidator(new ZeroOffsetRule());
 
-			validation.Validate(new SaveLotDtoTemp() { FixDate = new DateTimeOffset(DateTime.Now, TimeSpan.FromHours(3)) }).Issues.Should().HaveCount(1);
+			var time = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+
+			validation.Validate(new SaveLotDtoTemp() { FixDate = new DateTimeOffset(time, TimeSpan.FromHours(3)) }).Issues.Should().HaveCount(1);
 			validation.Validate(new SaveLotDtoTemp() { FixDate = new DateTimeOffset(DateTime.UtcNow, TimeSpan.FromHours(0)) }).Issues.Should().HaveCount(0);
 		}
 
