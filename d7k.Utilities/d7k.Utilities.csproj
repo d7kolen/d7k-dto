@@ -75,7 +75,6 @@
     <Compile Include="Web\MimeTypes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Web\MimeTypes.xml" />
   </ItemGroup>
   <ItemGroup>
