@@ -114,3 +114,35 @@ public static class DtoComplexHelper
 [DtoContainer(typeof(BusinessDto))]
 public static class LoadAllDto { }
 ```
+
+## Что если сигнатуры Dto различаются
+
+Допустим Dto классы не совсем эквавалентны: различаются имена полей или различаются их типы.
+
+```csharp
+class Cat
+{
+	public int Age { get; set; }
+}
+
+class Dog
+{
+	public int? Age { get; set; }
+}
+```
+
+В этом случае мы не сможемим выделить общий интерфейс. **d7k.Dto** предлагает такое решение:
+
+```csharp
+[DtoContainer]
+public static class Dto
+{
+	[DtoConvert]
+	static void Convert(Dog dst, Cat src)
+	{
+		dst.Age = src.Age;
+	}
+}
+```
+
+Ни кто вам не запрещает создавать интерфейс для каждого класса и определять конверторы для интерфейсов. Сигнатуру метода **Convert** вы можете найти в комментариях к **DtoConvertAttribute**.
