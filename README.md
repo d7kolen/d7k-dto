@@ -146,3 +146,49 @@ public static class Dto
 ```
 
 Ни кто вам не запрещает создавать интерфейс для каждого класса и определять конверторы для интерфейсов. Сигнатуру метода **Convert** вы можете найти в комментариях к **DtoConvertAttribute**.
+
+## Валидация
+
+Все данные, приходящие от клиентов, необходимо проверять. **d7k.Dto** предоставляет такую возможность
+
+```csharp
+static void Main(string[] args)
+{
+	var tCat = new Cat() { Name = " Snow " };
+	var validator = new ValidationRepository();
+	tCat = validator.FixValue(tCat, nameof(tCat), x => x.NotEmpty().ValidateDto());
+}
+
+class Cat
+{
+	public string Name { get; set; }
+}
+
+[DtoContainer]
+public static class Dto
+{
+	[DtoValidate]
+	static void Validate(ValidationRuleFactory<Cat> t)
+	{
+		t.RuleFor(x => x.Name).Trim().NotEmpty();
+	}
+}
+```
+
+**ValidateDto** это еще один метод расширения в нашем DtoComplexHelper:
+
+```csharp
+public static class DtoComplexHelper
+{
+...
+	public static PathValidation<TSrc, TProperty> ValidateDto<TSrc, TProperty>(this PathValidation<TSrc, TProperty> validation)
+	{
+		return validation.ValidateDto(m_dto);
+	}
+}
+```
+
+Механизм валидации может не только проверить корректность присланных данных, но и скорректировать какие-то простые случае (в нашем примере - убрать пустые символы в начале и в конце строки).
+
+В качестве валидируемого метода может выступать интерфейс. Поэтому, классы могут быть разделены на интерфейсы и валидация может производиться для каждого интерфейса в отдельности.
+
