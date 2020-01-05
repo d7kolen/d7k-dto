@@ -215,7 +215,7 @@ public static class DtoComplexHelper
 ## Валидация массивов и списков
 ## Вложенная комплексная валидация
 
-##[Функции валидации](Doc/ValidateFunctions.md)
+## [Функции валидации](Doc/ValidateFunctions.md)
 
 ###### Empty
 | Функция | Назначение | Комментарий |
