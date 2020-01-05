@@ -96,7 +96,7 @@ public static class Dto
 }
 ```
 
-Скорректируем инициализацию **DtoContex**
+Скорректируем инициализацию **DtoContext**
 
 ```csharp
 public static class DtoComplexHelper
