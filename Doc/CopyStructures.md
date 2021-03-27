@@ -9,6 +9,7 @@ static void Main(string[] args)
 
 	var tCat = new Cat() { Name = "Snow" };
 	var tDog = new Dog().CopyFrom(tCat, dto);
+	// tDog.Name == "Snow";
 }
 
 public interface IName
@@ -42,6 +43,7 @@ static void Main(string[] args)
 	
 	var tCat = new Cat() { Name = "Snow" };
 	var tDog = new Dog().CopyFrom(tCat, dto);
+	//tDog.Name == "Snow"
 }
 
 class Cat
@@ -150,14 +152,14 @@ static void Main(string[] args)
 
 	var tCat = new Cat() { Id = 3.5 };
 	var tDog = new Dog().CopyFrom(tCat, dto);
-	//tDog.Id = 3 (int)
+	//tDog.Id == 3 (int)
 
 	var tCatOther = new Cat().CopyFrom(tDog, dto);
-	//tCatOther.Id = 3.0 (double)
+	//tCatOther.Id == 3.0 (double)
 }
 
 [DtoContainer]
-static class AnimalDto
+static class Dto
 {
 	interface IId<T>
 	{
@@ -169,3 +171,57 @@ static class AnimalDto
 }
 ```
 
+В этом примере у класса Cat поле Id имеет тип **double**, а у Dog тоже поле имеет тип **int**. В примере показывается что возможно копирование и в одну и в другую сторону (но с очевидной потерей точности).
+
+Вы скажите, что в анотации к статья говорилось об отсутствии магии, но здесь без нее явно не обошлось. Да, но нет...
+
+Дело в том, что в случае, когда типы полей разные у классов для случая с генериками, **DtoComplex** пытается привести Source значение к Destination через стандартную операцию преобразования типа: 
+
+```csharp
+int a = (int)3.5;
+```
+
+Именно это и означает слово "Незначительно". Если преобразование невозможно, то во время копирования поднимется InvalidCastException. Это же произойдет при попытки скопировать (int?)null в int свойство.
+
+## Если вы хотите описать общие интерфейсы через Generic-и с серьезными различиями
+
+Что если мы все же хотим обрабатывать Null или же у классов такие поля, которые не могут быть трансформированы через стандартное преобразование:
+
+```csharp
+class Cat
+{
+	public int? Id { get; set; }
+}
+
+class Dog
+{
+	public int Id { get; set; }
+}
+
+static void Main(string[] args)
+{
+	var dto = new DtoComplex().ByNestedClassesWithAttributes();
+
+	var tCat = new Cat() { Id = null };
+	var tDog = new Dog().CopyFrom(tCat, dto);
+	//tDog.Id == 10
+}
+
+[DtoContainer]
+static class AnimalDto
+{
+	interface IId<T>
+	{
+		T Id { get; set; }
+	}
+
+	[DtoCast]
+	static int Cast(int? src)
+	{
+		return src ?? 10;
+	}
+
+	class Cat_Dto : Cat, IId<int?> { }
+	class Dog_Dto : Dog, IId<int> { }
+}
+```
