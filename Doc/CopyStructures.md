@@ -61,7 +61,7 @@ class Dog
  
 ```csharp
 [DtoContainer]
-public static class Dto
+static class Dto
 {
 	interface IName
 	{
@@ -117,7 +117,7 @@ class Dog
 
 ```csharp
 [DtoContainer]
-public static class Dto
+static class Dto
 {
 	[DtoConvert]
 	static void Convert(Dog dst, Cat src)
@@ -208,7 +208,7 @@ static void Main(string[] args)
 }
 
 [DtoContainer]
-static class AnimalDto
+static class Dto
 {
 	interface IId<T>
 	{
@@ -227,3 +227,45 @@ static class AnimalDto
 ```
 
 **DtoCast** метод определяет то, как **DtoComplex** должен выполнять трансформацию типов для generic свойств. В случае если ничего подходящего не найдено, то делается попытка использовать трансформацию по умолчанию.
+
+## Если какой-то интерфейс не должен участвовать в копировании
+
+Предположим мы определили интерфейс только для валидации структур данных или для приведения объекта к типу (для полиморфизма). Копирование для него нам не нужно:
+
+```csharp
+class Cat
+{
+	public int Id { get; set; }
+}
+
+class Dog
+{
+	public int Id { get; set; }
+}
+
+static void Main(string[] args)
+{
+	var dto = new DtoComplex().ByNestedClassesWithAttributes();
+
+	var tCat = new Cat() { Id = 5 };
+	var tDog = new Dog().CopyFrom(tCat, dto);
+	//tDog.Id == 0
+}
+
+[DtoContainer]
+static class Dto
+{
+	[DtoNonCopy]
+	interface IId
+	{
+		int Id { get; set; }
+	}
+
+	class Cat_Dto : Cat, IId { }
+	class Dog_Dto : Dog, IId { }
+}
+```
+
+Вы можете промаркеровать такой интерфейс **DtoNonCopy** аттрибутом. В этом случае **DtoComplex** будет игнорировать такой интерфейс - он не будет участвовать в копировании.
+
+О приведении типа и о валидации будет рассказано в других разделах.
