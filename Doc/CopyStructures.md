@@ -61,7 +61,7 @@ class Dog
 [DtoContainer]
 public static class Dto
 {
-	public interface IName
+	interface IName
 	{
 		string Name { get; set; }
 	}
@@ -91,6 +91,9 @@ static void Main(string[] args)
 [DtoContainer(typeof(BusinessDto))]
 public static class LoadAllDto { }
 ```
+
+Dto класс, помеченный аттрибутом DtoContainer, должен быть статическим. Об этом написано в комментарии **DtoContainer**.
+Для интерфейсрв описанных в Dto классе ограничений на публичность нет, как и для Cat_Dto и Dog_Dto классов.
 
 ## Что если сигнатуры Dto различаются
 
@@ -122,4 +125,47 @@ public static class Dto
 }
 ```
 
-Ни кто вам не запрещает создавать интерфейс для каждого класса и определять конверторы для интерфейсов. Сигнатуру метода **Convert** вы можете найти в комментариях к **DtoConvertAttribute**.
+Ни кто вам не запрещает создавать интерфейс для каждого класса и определять конверторы для интерфейсов.
+
+Все возможные сигнатуру метода **Convert** вы можете найти в комментариях к **DtoConvertAttribute**.
+
+## Если вы хотите описать общие интерфейсы через Generic-и
+
+Допустим Dto классы почти эквивалентны. "Незначительно" различаются их типы:
+
+```csharp
+class Cat
+{
+	public double Id { get; set; }
+}
+
+class Dog
+{
+	public int Id { get; set; }
+}
+
+static void Main(string[] args)
+{
+	var dto = new DtoComplex().ByNestedClassesWithAttributes();
+
+	var tCat = new Cat() { Id = 3.5 };
+	var tDog = new Dog().CopyFrom(tCat, dto);
+	//tDog.Id = 3 (int)
+
+	var tCatOther = new Cat().CopyFrom(tDog, dto);
+	//tCatOther.Id = 3.0 (double)
+}
+
+[DtoContainer]
+static class AnimalDto
+{
+	interface IId<T>
+	{
+		T Id { get; set; }
+	}
+
+	class Cat_Dto : Cat, IId<double> { }
+	class Dog_Dto : Dog, IId<int> { }
+}
+```
+
