@@ -7,24 +7,24 @@ static void Main(string[] args)
 {
 	var dto = new DtoComplex();
 
-	var tCat = new Cat() { Name = "Snow" };
+	var tCat = new Cat() { Age = 5 };
 	var tDog = new Dog().CopyFrom(tCat, dto);
-	// tDog.Name == "Snow";
+	// tDog.Age == 5;
 }
 
-public interface IName
+public interface IAge
 {
-	string Name { get; set; }
+	int Age { get; set; }
 }
 
-class Cat: IName
+class Cat: IAge
 {
-	public string Name { get; set; }
+	public int Age { get; set; }
 }
 
-class Dog: IName
+class Dog: IAge
 {
-	public string Name { get; set; }
+	public int Age { get; set; }
 }
 ```
 
@@ -41,19 +41,19 @@ static void Main(string[] args)
 {
 	var dto = new DtoComplex();
 	
-	var tCat = new Cat() { Name = "Snow" };
+	var tCat = new Cat() { Age = 5 };
 	var tDog = new Dog().CopyFrom(tCat, dto);
-	//tDog.Name == "Snow"
+	//tDog.Age == 5
 }
 
 class Cat
 {
-	public string Name { get; set; }
+	public int Age { get; set; }
 }
 
 class Dog
 {
-	public string Name { get; set; }
+	public int Age { get; set; }
 }
 ```
   
@@ -63,13 +63,13 @@ class Dog
 [DtoContainer]
 static class Dto
 {
-	interface IName
+	interface IAge
 	{
-		string Name { get; set; }
+		int Age { get; set; }
 	}
 
-	class Cat_Dto : Cat, IName { }
-	class Dog_Dto : Dog, IName { }
+	class Cat_Dto : Cat, IAge { }
+	class Dog_Dto : Dog, IAge { }
 }
 ```
 
@@ -127,7 +127,30 @@ static class Dto
 }
 ```
 
-Ни кто вам не запрещает создавать интерфейс для каждого класса и определять конверторы для интерфейсов.
+Ни кто вам не запрещает создавать интерфейс для каждого класса и определять конверторы для интерфейсов:
+
+
+```csharp
+[DtoContainer]
+static class Dto
+{
+	interface IAge_Int
+	{
+		int Age { get; set; }
+	}
+	
+	interface IAge_String
+	{
+		string Age { get; set; }
+	}
+
+	[DtoConvert]
+	static void Convert(IId_String dst, IId_Int src)
+	{
+		dst.Age = src.Age == null ? null : src.Age.ToString();
+	}
+}
+```
 
 Все возможные сигнатуру метода **Convert** вы можете найти в комментариях к **DtoConvertAttribute**.
 
@@ -138,40 +161,40 @@ static class Dto
 ```csharp
 class Cat
 {
-	public double Id { get; set; }
+	public double Age { get; set; }
 }
 
 class Dog
 {
-	public int Id { get; set; }
+	public int Age { get; set; }
 }
 
 static void Main(string[] args)
 {
 	var dto = new DtoComplex().ByNestedClassesWithAttributes();
 
-	var tCat = new Cat() { Id = 3.5 };
+	var tCat = new Cat() { Age = 3.5 };
 	var tDog = new Dog().CopyFrom(tCat, dto);
-	//tDog.Id == 3 (int)
+	//tDog.Age == 3 (int)
 
 	var tCatOther = new Cat().CopyFrom(tDog, dto);
-	//tCatOther.Id == 3.0 (double)
+	//tCatOther.Age == 3.0 (double)
 }
 
 [DtoContainer]
 static class Dto
 {
-	interface IId<T>
+	interface IAge<T>
 	{
-		T Id { get; set; }
+		T Age { get; set; }
 	}
 
-	class Cat_Dto : Cat, IId<double> { }
-	class Dog_Dto : Dog, IId<int> { }
+	class Cat_Dto : Cat, IAge<double> { }
+	class Dog_Dto : Dog, IAge<int> { }
 }
 ```
 
-В этом примере у класса Cat поле Id имеет тип **double**, а у Dog тоже поле имеет тип **int**. В примере показывается что возможно копирование и в одну и в другую сторону (но с очевидной потерей точности).
+В этом примере у класса Cat поле Age имеет тип **double**, а у Dog тоже поле имеет тип **int**. В примере показывается что возможно копирование и в одну и в другую сторону (но с очевидной потерей точности).
 
 Вы скажите, что в анотации к статья говорилось об отсутствии магии, но здесь без нее явно не обошлось. Да, но нет...
 
@@ -190,29 +213,29 @@ int a = (int)3.5;
 ```csharp
 class Cat
 {
-	public int? Id { get; set; }
+	public int? Age { get; set; }
 }
 
 class Dog
 {
-	public int Id { get; set; }
+	public int Age { get; set; }
 }
 
 static void Main(string[] args)
 {
 	var dto = new DtoComplex().ByNestedClassesWithAttributes();
 
-	var tCat = new Cat() { Id = null };
+	var tCat = new Cat() { Age = null };
 	var tDog = new Dog().CopyFrom(tCat, dto);
-	//tDog.Id == 10
+	//tDog.Age == 10
 }
 
 [DtoContainer]
 static class Dto
 {
-	interface IId<T>
+	interface IAge<T>
 	{
-		T Id { get; set; }
+		T Age { get; set; }
 	}
 
 	[DtoCast]
@@ -221,8 +244,8 @@ static class Dto
 		return src ?? 10;
 	}
 
-	class Cat_Dto : Cat, IId<int?> { }
-	class Dog_Dto : Dog, IId<int> { }
+	class Cat_Dto : Cat, IAge<int?> { }
+	class Dog_Dto : Dog, IAge<int> { }
 }
 ```
 
@@ -235,37 +258,37 @@ static class Dto
 ```csharp
 class Cat
 {
-	public int Id { get; set; }
+	public int Age { get; set; }
 }
 
 class Dog
 {
-	public int Id { get; set; }
+	public int Age { get; set; }
 }
 
 static void Main(string[] args)
 {
 	var dto = new DtoComplex().ByNestedClassesWithAttributes();
 
-	var tCat = new Cat() { Id = 5 };
+	var tCat = new Cat() { Age = 5 };
 	var tDog = new Dog().CopyFrom(tCat, dto);
-	//tDog.Id == 0
+	//tDog.Age == 0
 }
 
 [DtoContainer]
 static class Dto
 {
 	[DtoNonCopy]
-	interface IId
+	interface IAge
 	{
-		int Id { get; set; }
+		int Age { get; set; }
 	}
 
-	class Cat_Dto : Cat, IId { }
-	class Dog_Dto : Dog, IId { }
+	class Cat_Dto : Cat, IAge { }
+	class Dog_Dto : Dog, IAge { }
 }
 ```
 
 Вы можете промаркеровать такой интерфейс **DtoNonCopy** аттрибутом. В этом случае **DtoComplex** будет игнорировать такой интерфейс - он не будет участвовать в копировании.
 
-О приведении типа и о валидации будет рассказано в других разделах.
+О приведении типа и о валидации будет рассказывается в других разделах.
