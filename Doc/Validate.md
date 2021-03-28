@@ -159,3 +159,46 @@ public static class Dto
 Можно не беспокоиться о том, что массив в какой-то момент приходит пустым. Делегаты в **RuleFor** никогда не исполняются. Их задача выявить правила доступа к части объекта. Метод **ScanAll**, тоже не вызывается - он лишь говорит системе о необходимости просканировать все объекты коллекции. Более того, вызов **ScanAll** всегда поднимает исключение NotImplementedException.
 
 Все валидаторы вызываются в том же порядке, что и определены. Поэтому если во время **ScanAll** вдруг какой-то элемент массива решит стать пустым, то для удаления его из коллекции правило со **SkipEmpty** лучше опустить ниже правила со **ScanAll**.
+
+## "External polymorphism"
+
+```csharp
+static void Main(string[] args)
+{
+	var dto = new DtoComplex().ByNestedClassesWithAttributes();
+
+	var cat = new Cat
+	{
+		Name = "  Snow  ",
+		Kitten = new Cat
+		{
+			Name = "  Red  ",
+			Kitten = new Cat
+			{
+				Name = " Bully "
+			}
+		}
+	};
+
+	dto.FixValue(cat, nameof(cat), x => x.NotEmpty().NotEmpty().ValidateDto());
+	//cat.Name == "Snow"
+	//cat.Kitten.Name == "Red"
+	//cat.Kitten.Kitten.Name == "Bully"
+}
+
+class Cat
+{
+	public string Name { get; set; }
+	public Cat Kitten { get; set; }
+}
+
+[DtoContainer]
+public static class Dto
+{
+	[DtoValidate]
+	static void Validate(ValidationRuleFactory<Cat> t)
+	{
+		t.RuleFor(x => x.Name).Trim();
+		t.RuleFor(x => x.Kitten).ValidateDto();
+	}
+}
