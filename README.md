@@ -50,7 +50,7 @@ static class Dto
 }
 ```
 
-Объяснение под [ссылкой](Doc/CopyStructures.md)
+[Заинтересовался?](Doc/CopyStructures.md)
 
 ## Копирование части объекта
 ????? Только root поля. Метов Update
@@ -91,11 +91,7 @@ public static class Dto
 }
 ```
 
-Объяснение под [ссылкой](Doc/Validate.md)
-
-## Валидация вложенных структур
-## Валидация массивов и списков
-## Вложенная комплексная валидация
+[Заинтересовался?](Doc/Validate.md)
 
 ## [Функции валидации](Doc/ValidateFunctions.md)
 
