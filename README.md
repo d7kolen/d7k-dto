@@ -50,6 +50,8 @@ static class Dto
 }
 ```
 
+Объяснение под [ссылкой](Doc/CopyStructures.md)
+
 ## Копирование части объекта
 ????? Только root поля. Метов Update
 
@@ -88,6 +90,8 @@ public static class Dto
 	class Cat_Dto : Cat, IName { }
 }
 ```
+
+Объяснение под [ссылкой](Doc/Validate.md)
 
 ## Валидация вложенных структур
 ## Валидация массивов и списков
