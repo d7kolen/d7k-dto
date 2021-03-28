@@ -102,3 +102,6 @@ public static class Dto
 ## Кастомная валидация и ValidationRule
 ## DtoAdapter
 ## DtoObject
+
+Внешнее наследование или extension inheritance
+Внешний полиморфизм или extension polymorphism
