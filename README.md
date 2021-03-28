@@ -17,6 +17,39 @@
 
 ## [Копирование объектов](Doc/CopyStructures.md)
 
+```csharp
+static void Main(string[] args)
+{
+	var dto = new DtoComplex().ByNestedClassesWithAttributes();
+	
+	var tCat = new Cat() { Age = 5 };
+	var tDog = new Dog().CopyFrom(tCat, dto);
+	//tDog.Age == 5
+}
+
+class Cat
+{
+	public int Age { get; set; }
+}
+
+class Dog
+{
+	public int Age { get; set; }
+}
+
+[DtoContainer]
+static class Dto
+{
+	interface IAge
+	{
+		int Age { get; set; }
+	}
+
+	class Cat_Dto : Cat, IAge { }
+	class Dog_Dto : Dog, IAge { }
+}
+```
+
 ## Копирование части объекта
 ????? Только root поля. Метов Update
 
