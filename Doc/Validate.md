@@ -5,9 +5,12 @@
 ```csharp
 static void Main(string[] args)
 {
-	var tCat = new Cat() { Name = " Snow " };
-	var validator = new ValidationRepository();
-	tCat = validator.FixValue(tCat, nameof(tCat), x => x.NotEmpty().ValidateDto());
+	var dto = new DtoComplex().ByNestedClassesWithAttributes();
+
+	var cat = new Cat() { Name = "  Snow  " };
+	
+	dto.FixValue(cat, nameof(cat), x => x.NotEmpty().ValidateDto());
+	//cat.Name == "Snow"
 }
 
 class Cat
