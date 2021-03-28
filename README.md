@@ -58,17 +58,34 @@ static class Dto
 ```csharp
 static void Main(string[] args)
 {
-	var dto = new DtoComplex();
+	var dto = new DtoComplex().ByNestedClassesWithAttributes();
 
-	var cat = new Cat();
+	var cat = new Cat() { Name = "  Snow  " };
 	
-	dto.FixValue(cat, nameof(cat), x => x.NotEmpty());
+	dto.FixValue(cat, nameof(cat), x => x.ValidateDto());
 	//cat.Name == "Snow"
 }
 
 class Cat
 {
 	public string Name { get; set; }
+}
+
+[DtoContainer]
+public static class Dto
+{
+	public interface IName
+	{
+		string Name { get; set; }
+	}
+
+	[DtoValidate]
+	static void Validate(ValidationRuleFactory<IName> t)
+	{
+		t.RuleFor(x => x.Name).Trim();
+	}
+
+	class Cat_Dto : Cat, IName { }
 }
 ```
 
