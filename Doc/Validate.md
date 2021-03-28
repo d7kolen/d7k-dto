@@ -129,7 +129,7 @@ static void Main(string[] args)
 
 	var cat = new Cat() { KittenNames = new[] { "  Snow  ", "  ", " Red " } };
 
-	dto.FixValue(cat, nameof(cat), x => x.NotEmpty().NotEmpty().ValidateDto());
+	dto.FixValue(cat, nameof(cat), x => x.NotEmpty().ValidateDto());
 	//cat.Name == ["Snow", "Red"]
 }
 		
@@ -180,7 +180,7 @@ static void Main(string[] args)
 		}
 	};
 
-	dto.FixValue(cat, nameof(cat), x => x.NotEmpty().NotEmpty().ValidateDto());
+	dto.FixValue(cat, nameof(cat), x => x.NotEmpty().ValidateDto());
 	//cat.Name == "Snow"
 	//cat.Kitten.Name == "Red"
 	//cat.Kitten.Kitten.Name == "Bully"
