@@ -22,6 +22,23 @@
 
 ## [Валидация](Doc/Validate.md)
 
+```csharp
+static void Main(string[] args)
+{
+	var dto = new DtoComplex();
+
+	var cat = new Cat();
+	
+	dto.FixValue(cat, nameof(cat), x => x.NotEmpty());
+	//cat.Name == "Snow"
+}
+
+class Cat
+{
+	public string Name { get; set; }
+}
+```
+
 ## Валидация вложенных структур
 ## Валидация массивов и списков
 ## Вложенная комплексная валидация
