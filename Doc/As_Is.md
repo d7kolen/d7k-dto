@@ -3,7 +3,7 @@
 ```csharp
 static void Main(string[] args)
 {
-  var dto = new DtoComplex().ByNestedClassesWithAttributes();
+	var dto = new DtoComplex().ByNestedClassesWithAttributes();
 
 	var cat = new Cat
 	{
