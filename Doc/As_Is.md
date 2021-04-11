@@ -1,5 +1,7 @@
 # AS и IS
 
+## Привидение типа объекта (AS)
+
 ```csharp
 static void Main(string[] args)
 {
@@ -33,3 +35,5 @@ public static class Dto
 	class Cat_Dto : Cat, IName { }
 }
 ```
+
+В примере выше мы создали класс Cat и ассоциировали его с интерфейсом IName.
