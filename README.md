@@ -95,7 +95,7 @@ public static class Dto
 
 ## [Функции валидации](Doc/ValidateFunctions.md)
 
-## AS и IS
+## [AS и IS](Doc/As_Is.md)
 
 Внешнее наследование или extension inheritance
 Внешний полиморфизм или extension polymorphism
