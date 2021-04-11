@@ -50,7 +50,7 @@ static class Dto
 }
 ```
 
-[Заинтересовался?](Doc/CopyStructures.md)
+[Интересно?](Doc/CopyStructures.md)
 
 ## Копирование части объекта
 ????? Только root поля. Метов Update
@@ -91,7 +91,7 @@ public static class Dto
 }
 ```
 
-[Заинтересовался?](Doc/Validate.md)
+[Интересно?](Doc/Validate.md)
 
 ## [Функции валидации](Doc/ValidateFunctions.md)
 
