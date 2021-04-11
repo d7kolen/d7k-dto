@@ -97,5 +97,6 @@ public static class Dto
 
 ## [Приведение типа (AS)](Doc/As.md)
 
-Внешнее наследование или extension inheritance
-Внешний полиморфизм или extension polymorphism
+## [Философия](Doc/Philosophy.md)
+
+Немного занудства. Правда, не стоит
