@@ -93,7 +93,7 @@ public static class Dto
 
 [Интересно?](Doc/Validate.md)
 
-## [Функции валидации](Doc/ValidateFunctions.md)
+### [Функции валидации](Doc/ValidateFunctions.md)
 
 ## [AS и IS](Doc/As_Is.md)
 
