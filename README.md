@@ -50,7 +50,7 @@ static class Dto
 }
 ```
 
-[Интересно?](Doc/CopyStructures.md)
+[Интересно?](Doc/Copy.md)
 
 ## Копирование части объекта
 ????? Только root поля. Метов Update
