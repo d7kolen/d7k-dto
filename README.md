@@ -95,9 +95,7 @@ public static class Dto
 
 ## [Функции валидации](Doc/ValidateFunctions.md)
 
-## Кастомная валидация и ValidationRule
-## DtoAdapter
-## DtoObject
+## AS и IS
 
 Внешнее наследование или extension inheritance
 Внешний полиморфизм или extension polymorphism
