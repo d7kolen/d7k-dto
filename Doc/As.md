@@ -58,6 +58,7 @@ static void Main(string[] args)
 
 	name.Name = "Coal";
 	//name.Name == "Coal";
+	//cat.Name == "Coal";
 }
 
 ...
