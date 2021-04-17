@@ -207,3 +207,70 @@ public static class Dto
 Как было сказано выше, метод **ValidateDto** самостоятельно выбирает нужный валидатор. В этом примере ничего нового, кроме демонстрации возможности достаточно компактно и без дублирования определять валидацию сильно вложенных и рекурсивных структур.
 
 Главное, что бы не возникло зацикливания - это прямой путь к StackOverflow. На текущий момент библиотека не отслеживает это.
+
+## Отказ от валидации отдельных полей
+
+Представим ситуацию, что у вас в системе у запросов на изменение есть поле *Список полей для обновления*. Вы обновляете только их, а остальные поля в запросе вы игнорируете. В этой связи налагать на них какие-то ограничения, с помощью валидации странно...
+
+```csharp
+static void Main(string[] args)
+{
+	var dto = new DtoComplex().ByNestedClassesWithAttributes();
+
+	var updateCat = new UpdateCat
+	{
+		Age = 1,
+		UpdationList = new[] { nameof(UpdateCat.Age) }.ToList()
+	};
+
+	dto.FixValue(updateCat, nameof(updateCat), x => x.ValidateDto());
+
+	var newCat = new NewCat
+	{
+		Age = 1,
+		Weight = 2
+	};
+
+	dto.FixValue(newCat, nameof(newCat), x => x.ValidateDto());
+}
+
+class UpdateCat
+{
+	public int Age { get; set; }
+	public int Weight { get; set; }
+	public List<string> UpdationList { get; set; } = new List<string>();
+}
+
+class NewCat
+{
+	public int Age { get; set; }
+	public int Weight { get; set; }
+}
+
+[DtoContainer]
+public static class Dto
+{
+	public interface ICat
+	{
+		int Age { get; set; }
+		int Weight { get; set; }
+	}
+
+	[DtoValidate]
+	static void Validate(ValidationRuleFactory<ICat> t)
+	{
+		var updateCat = t.OriginalValue as UpdateCat;
+
+		if (updateCat == null || updateCat.UpdationList.Contains(nameof(ICat.Age)))
+			t.RuleFor(x => x.Age).Greater(0);
+
+		if (updateCat == null || updateCat.UpdationList.Contains(nameof(ICat.Weight)))
+			t.RuleFor(x => x.Weight).Greater(0);
+	}
+
+	class UpdateCat_Dto : UpdateCat, ICat { }
+	class NewCat_Dto : NewCat, ICat { }
+}
+```
+
+В валидаторе вы имеете доступ к своему оригинальному объекту. Если у вас есть необходимость в вариативности, то у вас есть возможность ее организовать.
