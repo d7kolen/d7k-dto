@@ -189,7 +189,7 @@ namespace d7k.Dto.Tests
 
 			var obj = new CopyClass0() { A = 1 };
 
-			new ValidationRepository().Validate(obj, x => x.RuleFor(t => t).ValidateDto(dto)).Issues.Should().HaveCount(0);
+			dto.Validate(obj, x => x.RuleFor(t => t).ValidateDto()).Issues.Should().HaveCount(0);
 		}
 
 		[TestMethod]
@@ -199,7 +199,7 @@ namespace d7k.Dto.Tests
 
 			var obj = new CopyClass0() { A = -1 };
 
-			new ValidationRepository().Validate(obj, x => x.RuleFor(t => t).ValidateDto(dto)).Issues.Should().HaveCount(1);
+			dto.Validate(obj, x => x.RuleFor(t => t).ValidateDto()).Issues.Should().HaveCount(1);
 		}
 
 		[TestMethod]
@@ -209,7 +209,7 @@ namespace d7k.Dto.Tests
 
 			var obj = new CopyClass1() { A = -1, B = "a" };
 
-			var issues = new ValidationRepository().Validate(obj, x => x.RuleFor(t => t).ValidateDto(dto)).Issues;
+			var issues = dto.Validate(obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
 			issues.Should().HaveCount(2);
 		}
 
@@ -220,7 +220,7 @@ namespace d7k.Dto.Tests
 
 			var obj = new CopyClass1() { A = 1, B = " b " };
 
-			obj = new ValidationRepository().FixValue(obj, nameof(obj), x => x.ValidateDto(dto));
+			obj = dto.FixValue(obj, nameof(obj), x => x.ValidateDto());
 			obj.B.Should().Be("b");
 		}
 
@@ -231,7 +231,7 @@ namespace d7k.Dto.Tests
 
 			var obj = new CopyClass0() { A = -1 };
 
-			var issues = new ValidationRepository().Validate(obj, x => x.RuleFor(t => t).ValidateDto(dto)).Issues;
+			var issues = dto.Validate(obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
 			issues.Should().HaveCount(1);
 		}
 
@@ -300,6 +300,260 @@ namespace d7k.Dto.Tests
 		}
 
 		[TestMethod]
+		public void Copy_NestedWithGenerics_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithGenerics));
+
+			var src = new CopyClass_MyTemplateItem() { A = new MyTemplateItem() { A = 1 } };
+			var dst = new CopyClass0();
+
+			var res = dto.Copy(dst, src);
+			res.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void Copy_NestedWithGenerics_Test1()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithGenerics));
+
+			var src = new CopyClass0() { A = 1 };
+			var dst = new CopyClass_MyTemplateItem();
+
+			var res = dto.Copy(dst, src);
+			res.A.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void Update_NestedWithGenerics_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithGenerics));
+
+			var src = new CopyClass0() { A = 1 };
+			var dst = new CopyClass_MyTemplateItem();
+
+			var res = dto.Update(dst, src, nameof(src.A));
+
+			res.A.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void Update_NestedWithGenerics_Test1()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithGenerics));
+
+			var src = new CopyClass0() { A = 1 };
+			var dst = new CopyClass_MyTemplateItem();
+
+			var res = dto.Update(dst, src);
+
+			res.A.Should().BeNull();
+		}
+
+		[TestMethod]
+		public void Copy_NestedWithGenerics_WithIgnore_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithGenerics_WithIgnore));
+
+			var src = new CopyClass0() { A = 1 };
+			var dst = new CopyClass_MyTemplateItem();
+
+			var res = dto.Copy(dst, src);
+
+			res.A.Should().BeNull();
+		}
+
+		[TestMethod]
+		public void Copy_NestedWithGenerics_WithIgnore_Test1()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithGenerics_WithIgnore1));
+
+			var src = new NestedWithGenerics_WithIgnore1.CopyClass0() { A = 1 };
+			var dst = new NestedWithGenerics_WithIgnore1.CopyClass_MyTemplateItem();
+
+			var res = dto.Copy(dst, src);
+
+			res.A.Should().BeNull();
+		}
+
+		[TestMethod]
+		public void Validate_NestedWithGenerics_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithGenerics));
+
+			var obj = new CopyClass_MyTemplateItem();
+
+			var issues = dto.Validate(obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
+			issues.Should().HaveCount(1);
+		}
+
+		[TestMethod]
+		public void Copy_NestedWithGenericsTypedCast_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithGenericsTypedCast));
+
+			var src = new NestedWithGenericsTypedCast.CopyClass0_string() { A = "1" };
+			var dst = new NestedWithGenericsTypedCast.CopyClass0_int();
+
+			var res = dto.Copy(dst, src);
+			res.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void Copy_NestedWithGenericsTypedCast_Test1()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithGenericsTypedCast));
+
+			var src = new NestedWithGenericsTypedCast.CopyClass1_string() { A = "1" };
+			var dst = new NestedWithGenericsTypedCast.CopyClass1_int();
+
+			AssertionExtensions.Should(() => dto.Copy(dst, src)).Throw<InvalidOperationException>();
+		}
+
+		[TestMethod]
+		public void Convert_NestedWithConvert_WithGeneric_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithGeneric));
+
+			var src = new NestedWithConvert_WithGeneric.CopyClass_Decimal() { A = 1.1m };
+			var dst = new NestedWithConvert_WithGeneric.CopyClass_Int();
+
+			dto.Copy(dst, src);
+			dst.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void Convert_NestedWithConvert_WithGeneric_Test1()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithGeneric));
+
+			var src = new NestedWithConvert_WithGeneric.CopyClass_Int() { A = 1 };
+			var dst = new NestedWithConvert_WithGeneric.CopyClass_Int1();
+
+			dto.Copy(dst, src);
+			dst.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void Update_Convert_NestedWithConvert_WithGeneric_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithGeneric));
+
+			var src = new NestedWithConvert_WithGeneric.CopyClass_Decimal() { A = 1.1m };
+			var dst = new NestedWithConvert_WithGeneric.CopyClass_Int();
+
+			dto.Update(dst, src, nameof(src.A));
+			dst.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void Update_Convert_NestedWithConvert_WithGeneric_Test1()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithGeneric));
+
+			var src = new NestedWithConvert_WithGeneric.CopyClass_Decimal() { A = 1.1m };
+			var dst = new NestedWithConvert_WithGeneric.CopyClass_Int();
+
+			dto.Update(dst, src);
+			dst.A.Should().Be(0);
+		}
+
+		[TestMethod]
+		public void Convert_NestedWithConvert_WithPartialGeneric_Test_1()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithPartialGeneric_DstOnly));
+
+			var dst = new NestedWithConvert_WithPartialGeneric_DstOnly.CopyClass_Decimal();
+			var src = new NestedWithConvert_WithPartialGeneric_DstOnly.CopyClass_Int() { A = 1 };
+
+			dto.Copy(dst, src);
+			dst.A.Should().Be(1m);
+		}
+
+		[TestMethod]
+		public void Convert_NestedWithConvert_WithPartialGeneric_Test_2()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithPartialGeneric_SrcOnly));
+
+			var dst = new NestedWithConvert_WithPartialGeneric_SrcOnly.CopyClass_Decimal();
+			var src = new NestedWithConvert_WithPartialGeneric_SrcOnly.CopyClass_Int() { A = 1 };
+
+			dto.Copy(dst, src);
+			dst.A.Should().Be(1m);
+		}
+
+		[TestMethod]
+		public void NestedWithConvert_WithGeneric_WithFilters_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithGeneric_WithFilters));
+
+			var src = new NestedWithConvert_WithGeneric_WithFilters.CopyClass_Decimal() { A = 1.1m };
+			var dst = new NestedWithConvert_WithGeneric_WithFilters.CopyClass_Int();
+
+			dto.Copy(dst, src);
+			dst.A.Should().Be(0);
+		}
+
+		[TestMethod]
+		public void Convert_NestedWithConvert_WithGeneric_WithFilters_Test1()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithGeneric_WithFilters));
+
+			var src = new NestedWithConvert_WithGeneric_WithFilters.CopyClass_Int() { A = 1 };
+			var dst = new NestedWithConvert_WithGeneric_WithFilters.CopyClass_Decimal();
+
+			dto.Copy(dst, src);
+			dst.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void NestedWithConvert_WithGeneric_WithParentFilters_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithGeneric_WithParentFilters));
+
+			var src = new NestedWithConvert_WithGeneric_WithParentFilters.CopyClass_Decimal() { A = 1.1m };
+			var dst = new NestedWithConvert_WithGeneric_WithParentFilters.CopyClass_ChildItem();
+
+			dto.Copy(dst, src);
+			dst.A.Name.Should().Be(1.1m);
+		}
+
+		[TestMethod]
+		public void NestedWithConvert_WithGeneric_WithParentFilters_Test1()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithGeneric_WithParentFilters));
+
+			var src = new NestedWithConvert_WithGeneric_WithParentFilters.CopyClass_Decimal() { A = 1.1m };
+			var dst = new NestedWithConvert_WithGeneric_WithParentFilters.CopyClass_OtherItem();
+
+			dto.Copy(dst, src);
+			dst.A.Should().BeNull();
+		}
+
+		[TestMethod]
+		public void NestedWithConvert_WithGeneric_WithInterfaceFilters_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithGeneric_WithInterfaceFilters));
+
+			var src = new NestedWithConvert_WithGeneric_WithInterfaceFilters.CopyClass_Decimal() { A = 1.1m };
+			var dst = new NestedWithConvert_WithGeneric_WithInterfaceFilters.CopyClass_ChildItem();
+
+			dto.Copy(dst, src);
+			dst.A.Name.Should().Be(1.1m);
+		}
+
+		[TestMethod]
+		public void NestedWithConvert_WithGeneric_WithInterfaceFilters_Test1()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithConvert_WithGeneric_WithInterfaceFilters));
+
+			var src = new NestedWithConvert_WithGeneric_WithInterfaceFilters.CopyClass_Decimal() { A = 1.1m };
+			var dst = new NestedWithConvert_WithGeneric_WithInterfaceFilters.CopyClass_OtherItem();
+
+			dto.Copy(dst, src);
+			dst.A.Should().BeNull();
+		}
+
+		[TestMethod]
 		public void Copy_SubClasses_Test()
 		{
 			var dto = new DtoComplex();
@@ -317,56 +571,62 @@ namespace d7k.Dto.Tests
 
 			var obj = new CopyClass0() { A = -1 };
 
-			var issues = new ValidationRepository().Validate(obj, x => x.RuleFor(t => t).ValidateDto(dto)).Issues;
+			var issues = dto.Validate(obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
 			issues.Should().HaveCount(1);
 		}
 
 		[TestMethod]
 		public void Validate_WithoutClasses_Test()
 		{
-			var validation = new ValidationRepository();
-
 			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithoutClasses));
 
 			var obj = new CopyClass0_WithInterf() { A = -1 };
 
-			validation.Validate(obj, x => x.RuleFor(t => t).ValidateDto(dto)).Issues.Should().HaveCount(1);
+			dto.Validate(obj, x => x.RuleFor(t => t).ValidateDto()).Issues.Should().HaveCount(1);
 		}
 
 		[TestMethod]
 		public void Validate_WithStrongType_Test()
 		{
-			var validation = new ValidationRepository();
-
 			var dto = new DtoComplex().ByNestedClasses(typeof(NestedCopier_StrongValidatorType));
 
 			var obj = new CopyClass0();
-			var issues = validation.Validate(obj, x => x.RuleFor(t => t).ValidateDto(dto)).Issues;
+			var issues = dto.Validate(obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
 			issues.Should().HaveCount(1);
 		}
 
 		[TestMethod]
 		public void Validate_WithStrongType_ChildClass_Test()
 		{
-			var validation = new ValidationRepository();
-
 			var dto = new DtoComplex().ByNestedClasses(typeof(NestedCopier_StrongValidatorType));
 
 			var obj = new CopyClass0_WithInterf();
-			var issues = validation.Validate(obj, x => x.RuleFor(t => t).ValidateDto(dto)).Issues;
+			var issues = dto.Validate(obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
 			issues.Should().HaveCount(1);
 		}
 
 		[TestMethod]
 		public void Validate_WithoutType_Test()
 		{
-			var validation = new ValidationRepository();
-
 			var dto = new DtoComplex().ByNestedClasses(typeof(NestedCopier_StrongValidatorType));
 
 			var obj = new CopyClass0_WithInterf();
-			var issues = validation.Validate((object)obj, x => x.RuleFor(t => t).ValidateDto(dto)).Issues;
+			var issues = dto.Validate((object)obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
 			issues.Should().HaveCount(1);
+		}
+
+		[TestMethod]
+		public void BaseClassValidation_Validate_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(BaseClassValidation));
+
+			var obj = new BaseClassValidationChild() { A = -1 };
+			var issues = dto.Validate((object)obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
+			issues.Should().HaveCount(1);
+
+			obj = new BaseClassValidationChild() { A = 1 };
+			issues = dto.Validate((object)obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
+			issues.Should().HaveCount(0);
 		}
 
 		[TestMethod]
@@ -458,6 +718,28 @@ namespace d7k.Dto.Tests
 				.Throw<InvalidOperationException>()
 				.Where(x => x.Message.Contains(typeof(InvalidSignatures).FullName));
 		}
+
+		[TestMethod]
+		public void CastValues_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(NestedWithGenerics));
+
+			var src = new MyTemplateItem() { A = 1 };
+
+			dto.CastValue(src, out int dst);
+
+			dst.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void CastValues_DefaultCast_Test()
+		{
+			var dto = new DtoComplex();
+
+			dto.CastValue(1.5m, out int dst);
+
+			dst.Should().Be(1);
+		}
 	}
 
 	public class CopyClass0
@@ -495,6 +777,11 @@ namespace d7k.Dto.Tests
 	public interface ICopyClass1
 	{
 		string B { get; set; }
+	}
+
+	public interface ITemplateInterf1<T>
+	{
+		T A { get; set; }
 	}
 
 	public class CopyClass0_WithInterf : CopyClass0, ICopyClass0 { }
@@ -553,6 +840,241 @@ namespace d7k.Dto.Tests
 		static void Convert(ICopyClass1 dst, ICopyClass0 src)
 		{
 			dst.B = src.A.ToString();
+		}
+	}
+
+	public class NestedWithConvert_WithGeneric
+	{
+		public class CopyClass_Decimal
+		{
+			public decimal A { get; set; }
+		}
+
+		public class CopyClass_Int
+		{
+			public int A { get; set; }
+		}
+
+		public class CopyClass_Int1
+		{
+			public int A { get; set; }
+		}
+
+		[DtoNonCopy]
+		public interface ITemplateInterf1<T>
+		{
+			T A { get; set; }
+		}
+
+		class CopyClass0Ext : CopyClass_Decimal, ITemplateInterf1<decimal> { }
+		class CopyClass1Ext : CopyClass_Int, ITemplateInterf1<int> { }
+		class CopyClass2Ext : CopyClass_Int1, ITemplateInterf1<int> { }
+
+		[DtoConvert]
+		static void Convert<TDst, TSrc>(ITemplateInterf1<TDst> dst, ITemplateInterf1<TSrc> src, DtoComplex dto)
+		{
+			dst.A = dto.CastValue(src.A, out TDst t);
+		}
+	}
+
+	public class NestedWithConvert_WithGeneric_WithFilters
+	{
+		public class CopyClass_Decimal
+		{
+			public decimal A { get; set; }
+		}
+
+		public class CopyClass_Int
+		{
+			public int A { get; set; }
+		}
+
+		public class CopyClass_Int1
+		{
+			public int A { get; set; }
+		}
+
+		[DtoNonCopy]
+		public interface ITemplateInterf1<T>
+		{
+			T A { get; set; }
+		}
+
+		class CopyClass0Ext : CopyClass_Decimal, ITemplateInterf1<decimal> { }
+		class CopyClass1Ext : CopyClass_Int, ITemplateInterf1<int> { }
+		class CopyClass2Ext : CopyClass_Int1, ITemplateInterf1<int> { }
+
+		[DtoConvertFilter(typeof(decimal), typeof(int))]
+		[DtoConvert]
+		static void Convert<TDst, TSrc>(ITemplateInterf1<TDst> dst, ITemplateInterf1<TSrc> src, DtoComplex dto)
+		{
+			dst.A = dto.CastValue(src.A, out TDst t);
+		}
+	}
+
+	public class NestedWithConvert_WithGeneric_WithParentFilters
+	{
+		public class Item { public decimal Name { get; set; } }
+		public class ChildItem : Item { }
+		public class OtherItem { public decimal Name { get; set; } }
+
+		public class CopyClass_Decimal
+		{
+			public decimal A { get; set; }
+		}
+
+		public class CopyClass_Item
+		{
+			public Item A { get; set; }
+		}
+
+		public class CopyClass_ChildItem
+		{
+			public ChildItem A { get; set; }
+		}
+
+		public class CopyClass_OtherItem
+		{
+			public OtherItem A { get; set; }
+		}
+
+		[DtoNonCopy]
+		public interface ITemplateInterf1<T>
+		{
+			T A { get; set; }
+		}
+
+		class CopyClass0Ext : CopyClass_Decimal, ITemplateInterf1<decimal> { }
+		class CopyClass2Ext : CopyClass_ChildItem, ITemplateInterf1<ChildItem> { }
+		class CopyClass3Ext : CopyClass_OtherItem, ITemplateInterf1<OtherItem> { }
+
+		[DtoConvertFilter(typeof(Item))]
+		[DtoConvert]
+		static void Convert<TDst>(ITemplateInterf1<TDst> dst, ITemplateInterf1<decimal> src, DtoComplex dto)
+			where TDst : Item, new()
+		{
+			dst.A = new TDst();
+			dst.A.Name = src.A;
+		}
+	}
+
+	public class NestedWithConvert_WithGeneric_WithInterfaceFilters
+	{
+		public interface IName { decimal Name { get; set; } }
+
+		public class Item { public decimal Name { get; set; } }
+		public class ChildItem { public decimal Name { get; set; } }
+		public class OtherItem { public decimal Name { get; set; } }
+
+		public class CopyClass_Decimal
+		{
+			public decimal A { get; set; }
+		}
+
+		public class CopyClass_Item
+		{
+			public Item A { get; set; }
+		}
+
+		public class CopyClass_ChildItem
+		{
+			public ChildItem A { get; set; }
+		}
+
+		public class CopyClass_OtherItem
+		{
+			public OtherItem A { get; set; }
+		}
+
+		[DtoNonCopy]
+		public interface ITemplateInterf1<T>
+		{
+			T A { get; set; }
+		}
+
+		class Item0Ext : Item, IName { }
+		class Item1Ext : ChildItem, IName { }
+
+		class CopyClass0Ext : CopyClass_Decimal, ITemplateInterf1<decimal> { }
+		class CopyClass2Ext : CopyClass_ChildItem, ITemplateInterf1<ChildItem> { }
+		class CopyClass3Ext : CopyClass_OtherItem, ITemplateInterf1<OtherItem> { }
+
+		[DtoConvertFilter(typeof(IName))]
+		[DtoConvert]
+		static void Convert<TDst>(ITemplateInterf1<TDst> dst, ITemplateInterf1<decimal> src, DtoComplex dto)
+			where TDst : new()
+		{
+			dst.A = new TDst();
+			var name = dto.As<IName>(dst.A);
+			name.Name = src.A;
+		}
+	}
+
+	public class NestedWithConvert_WithPartialGeneric_DstOnly
+	{
+		public class CopyClass_Decimal
+		{
+			public decimal A { get; set; }
+		}
+
+		public class CopyClass_Int
+		{
+			public int A { get; set; }
+		}
+
+		public class CopyClass_Int1
+		{
+			public int A { get; set; }
+		}
+
+		[DtoNonCopy]
+		public interface ITemplateInterf1<T>
+		{
+			T A { get; set; }
+		}
+
+		class CopyClass0Ext : CopyClass_Decimal, ITemplateInterf1<decimal> { }
+		class CopyClass1Ext : CopyClass_Int, ITemplateInterf1<int> { }
+		class CopyClass2Ext : CopyClass_Int1, ITemplateInterf1<int> { }
+
+		[DtoConvert]
+		static void Convert<TDst>(ITemplateInterf1<TDst> dst, ITemplateInterf1<int> src, DtoComplex dto)
+		{
+			dst.A = (TDst)(object)(decimal)src.A;
+		}
+	}
+
+	public class NestedWithConvert_WithPartialGeneric_SrcOnly
+	{
+		public class CopyClass_Decimal
+		{
+			public decimal A { get; set; }
+		}
+
+		public class CopyClass_Int
+		{
+			public int A { get; set; }
+		}
+
+		public class CopyClass_Int1
+		{
+			public int A { get; set; }
+		}
+
+		[DtoNonCopy]
+		public interface ITemplateInterf1<T>
+		{
+			T A { get; set; }
+		}
+
+		class CopyClass0Ext : CopyClass_Decimal, ITemplateInterf1<decimal> { }
+		class CopyClass1Ext : CopyClass_Int, ITemplateInterf1<int> { }
+		class CopyClass2Ext : CopyClass_Int1, ITemplateInterf1<int> { }
+
+		[DtoConvert]
+		static void Convert<TSrc>(ITemplateInterf1<decimal> dst, ITemplateInterf1<TSrc> src, DtoComplex dto)
+		{
+			dst.A = (decimal)(int)(object)src.A;
 		}
 	}
 
@@ -637,6 +1159,145 @@ namespace d7k.Dto.Tests
 		}
 	}
 
+	public class MyTemplateItem
+	{
+		public int A { get; set; }
+	}
+
+	public class CopyClass_MyTemplateItem
+	{
+		public MyTemplateItem A { get; set; }
+	}
+
+	public class CopyClass_string
+	{
+		public string A { get; set; }
+	}
+
+	public class NestedWithGenerics
+	{
+		public interface ITemplateInterf<T>
+		{
+			T A { get; set; }
+		}
+
+		class CopyClass0Ext : CopyClass0, ITemplateInterf<int> { }
+		class CopyClass1Ext : CopyClass_MyTemplateItem, ITemplateInterf<MyTemplateItem> { }
+
+		[DtoCast]
+		static int Cast(MyTemplateItem src)
+		{
+			return src.A;
+		}
+
+		[DtoCast]
+		static MyTemplateItem Cast(int src)
+		{
+			return new MyTemplateItem() { A = src };
+		}
+
+		[DtoValidate]
+		static void Validate<T>(ValidationRuleFactory<ITemplateInterf<T>> t)
+		{
+			t.RuleFor(x => x.A).NotEmpty();
+		}
+	}
+
+	public class NestedWithGenerics_WithIgnore
+	{
+		[DtoNonCopy]
+		public interface ITemplateInterf<T>
+		{
+			T A { get; set; }
+		}
+
+		class CopyClass0Ext : CopyClass0, ITemplateInterf<int> { }
+		class CopyClass1Ext : CopyClass_MyTemplateItem, ITemplateInterf<MyTemplateItem> { }
+
+		[DtoCast]
+		static int Cast(MyTemplateItem src)
+		{
+			return src.A;
+		}
+
+		[DtoCast]
+		static MyTemplateItem Cast(int src)
+		{
+			return new MyTemplateItem() { A = src };
+		}
+	}
+
+	public class NestedWithGenerics_WithIgnore1
+	{
+		[DtoNonCopy]
+		public interface ITemplateInterf<T>
+		{
+			T A { get; set; }
+		}
+
+		public class CopyClass0 : ITemplateInterf<int>
+		{
+			public int A { get; set; }
+		}
+
+		public class CopyClass_MyTemplateItem : ITemplateInterf<MyTemplateItem>
+		{
+			public MyTemplateItem A { get; set; }
+		}
+
+		[DtoCast]
+		static int Cast(MyTemplateItem src)
+		{
+			return src.A;
+		}
+
+		[DtoCast]
+		static MyTemplateItem Cast(int src)
+		{
+			return new MyTemplateItem() { A = src };
+		}
+	}
+
+	public class NestedWithGenericsTypedCast
+	{
+		public interface ITemplateInterf<T>
+		{
+			T A { get; set; }
+		}
+
+		public class CopyClass0_int
+		{
+			public int A { get; set; }
+		}
+
+		public class CopyClass0_string
+		{
+			public string A { get; set; }
+		}
+
+		public class CopyClass1_int
+		{
+			public int A { get; set; }
+		}
+
+		public class CopyClass1_string
+		{
+			public string A { get; set; }
+		}
+
+		class CopyClass0_int_dto : CopyClass0_int, ITemplateInterf<int> { }
+		class CopyClass0_string_dto : CopyClass0_string, ITemplateInterf<string> { }
+
+		class CopyClass1_int_dto : CopyClass1_int, ITemplateInterf1<int> { }
+		class CopyClass1_string_dto : CopyClass1_string, ITemplateInterf1<string> { }
+
+		[DtoCast(typeof(ITemplateInterf<>))]
+		static int Cast(string src)
+		{
+			return int.Parse(src);
+		}
+	}
+
 	public class InvalidSignatures
 	{
 		[DtoValidate]
@@ -647,4 +1308,30 @@ namespace d7k.Dto.Tests
 
 	public class DtoAttribute : Attribute { }
 	public class Dto1Attribute : Attribute { }
+
+	public class BaseClassValidationParent
+	{
+		public int A { get; set; }
+	}
+
+	public class BaseClassValidationChild : BaseClassValidationParent
+	{
+		public int A { get; set; }
+	}
+
+	public class BaseClassValidation
+	{
+		public interface IInterf
+		{
+			int A { get; set; }
+		}
+
+		[DtoValidate]
+		static void Validate(ValidationRuleFactory<IInterf> fact)
+		{
+			fact.RuleFor(x => x.A).Greater(0);
+		}
+
+		class MyA : BaseClassValidationParent, IInterf { }
+	}
 }

@@ -13,7 +13,7 @@ namespace d7k.Dto
 			{
 				Convert.FromBase64String((string)value);
 			}
-			catch (FormatException)
+			catch (FormatException e)
 			{
 				return new[] { context.Issue(this, $"{nameof(Base64Rule)}.{GetType().Name}", $"'{context.ValuePath}' has wrong base64 format value '{value}'.") }.ToResult();
 			}

@@ -62,6 +62,17 @@ namespace d7k.Dto.Tests
 		}
 
 		[TestMethod]
+		public void DtoAdapter_WithoutStrongCast_Test()
+		{
+			var obj = new MyAdaptSource_MyAdaptChildItem { Source = new MyAdaptChildItem() };
+			var adapt = obj.DtoAdapter<IMyAdaptSource_MyAdaptItem>();
+
+			adapt.Source.Should().BeOfType<MyAdaptChildItem>();
+			AssertionExtensions.Should(() => adapt.Source = new MyAdaptChildItem()).NotThrow();
+			AssertionExtensions.Should(() => adapt.Source = new MyAdaptItem()).Throw<ArgumentException>();
+		}
+
+		[TestMethod]
 		public void DtoAdapter_MappingFail_Test()
 		{
 			var obj0 = new MySecondObj() { B = "abc" };
@@ -85,10 +96,18 @@ namespace d7k.Dto.Tests
 			AssertionExtensions.Should(() => obj0.DtoAdapter<IMyMethodObj>()).Throw<InvalidOperationException>();
 		}
 
+		//[TestMethod]
+		//public void DtoAdapter_MappingTypeFail_Test()
+		//{
+		//	var obj0 = new MyWrongTypeObj() { A = "abc" };
+		//
+		//	AssertionExtensions.Should(() => obj0.DtoAdapter<IMyObj>()).Throw<InvalidOperationException>();
+		//}
+
 		[TestMethod]
-		public void DtoAdapter_MappingTypeFail_Test()
+		public void DtoAdapter_MappingTypeFail_WithoutProperty_Test()
 		{
-			var obj0 = new MyWrongTypeObj() { A = "abc" };
+			var obj0 = new MyEmptyClass();
 
 			AssertionExtensions.Should(() => obj0.DtoAdapter<IMyObj>()).Throw<InvalidOperationException>();
 		}
@@ -187,6 +206,10 @@ namespace d7k.Dto.Tests
 		public string A { get; set; }
 	}
 
+	public class MyEmptyClass
+	{
+	}
+
 	public interface IMyMethodObj
 	{
 		int A { get; set; }
@@ -210,5 +233,18 @@ namespace d7k.Dto.Tests
 	{
 		public int A { get; set; }
 		public int B { get; set; }
+	}
+
+	public class MyAdaptItem { }
+	public class MyAdaptChildItem : MyAdaptItem { }
+
+	public interface IMyAdaptSource_MyAdaptItem
+	{
+		MyAdaptItem Source { get; set; }
+	}
+
+	class MyAdaptSource_MyAdaptChildItem
+	{
+		public MyAdaptChildItem Source { get; set; }
 	}
 }

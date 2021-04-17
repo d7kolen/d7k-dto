@@ -1,14 +1,20 @@
-﻿using d7k.Dto;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace Utilities.Dto.Tests
+namespace d7k.Dto.Tests
 {
 	[TestClass]
 	public class DtoCopierTests
 	{
+		#region Initialize
+
+		static DtoCopier s_copier = new DtoCopier();
+
+		#endregion
+
 		[TestMethod]
 		public void CopyInterf_Test()
 		{
@@ -57,29 +63,6 @@ namespace Utilities.Dto.Tests
 			dst.Other.Should().BeNull();
 		}
 
-		[TestMethod]
-		public void CopyInterf_WithHelper_Test()
-		{
-			var src = new CopyInterfInfo() { A = 1, Other = "other" };
-			var dst = new CopyInterfInfo();
-
-			dst = dst.ReadFrom(src, typeof(ICopyInfo));
-
-			dst.A.Should().Be(1);
-			dst.Other.Should().BeNull();
-		}
-
-		[TestMethod]
-		public void CopyObj_WithHelper_Test()
-		{
-			var src = new CopyObjInfo() { A = 1, Other = "other" };
-			var dst = new CopyObjInfo();
-
-			dst = dst.ReadFrom(src, typeof(ICopyInfo));
-
-			dst.A.Should().Be(1);
-			dst.Other.Should().BeNull();
-		}
 
 		[TestMethod]
 		public void CopyInterf_WithInheritance_Test()
@@ -149,6 +132,102 @@ namespace Utilities.Dto.Tests
 			dst.B.Should().Be(2);
 			dst.C.Should().Be(3);
 			dst.Other.Should().Be("other");
+		}
+
+		[TestMethod]
+		public void TmplCopy_Test()
+		{
+			var src = new TmplCopy<int>() { A = 1 };
+			var dst = new TmplCopy<int?>();
+
+			new DtoCopier().Copy(dst, typeof(TmplCopy<int>), src, typeof(TmplCopy<int?>), false, null);
+
+			dst.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void TmplCopy_With_ComplexProperty_Test()
+		{
+			var src = new TmplCopy<int>() { A = 1 };
+			var dst = new TmplCopy<MyItem>();
+
+			new DtoCopier().Copy(dst, typeof(TmplCopy<MyItem>), src, typeof(TmplCopy<int>), false, null);
+
+			dst.A.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void TmplCopy_With_ComplexProperty_Test1()
+		{
+			var src = new TmplCopy<MyItem>() { A = new MyItem() { A = 1 } };
+			var dst = new TmplCopy<int>();
+
+			new DtoCopier().Copy(dst, typeof(TmplCopy<int>), src, typeof(TmplCopy<MyItem>), false, null);
+
+			dst.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void TmplCopy_With_ComplexProperty_Test2()
+		{
+			var src = new TmplCopy<int>() { A = 1 };
+			var dst = new TmplCopy<MyItem_ImpliciteCast>();
+
+			new DtoCopier().Copy(dst, typeof(TmplCopy<MyItem_ImpliciteCast>), src, typeof(TmplCopy<int>), false, null);
+
+			dst.A.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void TmplCopy_With_ComplexProperty_Test3()
+		{
+			var src = new TmplCopy<MyItem_ImpliciteCast>() { A = new MyItem_ImpliciteCast() { A = 1 } };
+			var dst = new TmplCopy<int>();
+
+			new DtoCopier().Copy(dst, typeof(TmplCopy<int>), src, typeof(TmplCopy<MyItem_ImpliciteCast>), false, null);
+
+			dst.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void TmplCopy_With_CustomCast_Test()
+		{
+			var src = new TmplCopy<MyItem_WithoutCast>() { A = new MyItem_WithoutCast() { A = 1 } };
+			var dst = new TmplCopy<int>();
+
+			var casts = new DtoCopierCastStorage();
+			casts.Append(typeof(MyItem_WithoutCast).GetMethod(nameof(MyItem_WithoutCast.ToInt)));
+
+			new DtoCopier(casts).Copy(dst, typeof(TmplCopy<int>), src, typeof(TmplCopy<MyItem_WithoutCast>), false, null);
+
+			dst.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void TmplCopy_With_CustomTypeCast_Test()
+		{
+			var src = new TmplCopy<MyItem_WithoutCast>() { A = new MyItem_WithoutCast() { A = 1 } };
+			var dst = new TmplCopy<int>();
+
+			var casts = new DtoCopierCastStorage();
+			casts.Append(typeof(MyItem_WithoutCast).GetMethod(nameof(MyItem_WithoutCast.ToInt)), typeof(TmplCopy<>));
+
+			new DtoCopier(casts).Copy(dst, typeof(TmplCopy<int>), src, typeof(TmplCopy<MyItem_WithoutCast>), false, null);
+
+			dst.A.Should().Be(1);
+		}
+
+		[TestMethod]
+		public void TmplCopy_With_CustomTypeCast_ForOtherTmpl_Test()
+		{
+			var src = new TmplCopy<MyItem_WithoutCast>() { A = new MyItem_WithoutCast() { A = 1 } };
+			var dst = new TmplCopy<int>();
+
+			var casts = new DtoCopierCastStorage();
+			casts.Append(typeof(MyItem_WithoutCast).GetMethod(nameof(MyItem_WithoutCast.ToInt)), typeof(OtherTmplCopy<>));
+
+			AssertionExtensions.Should(() => new DtoCopier(casts).Copy(dst, typeof(TmplCopy<int>), src, typeof(TmplCopy<MyItem_WithoutCast>), false, null))
+				.Throw<InvalidOperationException>();
 		}
 
 		[TestMethod]
@@ -252,32 +331,6 @@ namespace Utilities.Dto.Tests
 			dst.B.Should().Be(0);
 			dst.Other.Should().BeNull();
 		}
-
-		[TestMethod]
-		public void UpdateObj_WithExclude_WithHelper_Test()
-		{
-			var src = new PartialCopyObjInfo() { A = 1, B = 2, Other = "other" };
-			var dst = new PartialCopyObjInfo();
-
-			dst = src.UpdateWithExclude(dst, typeof(IPartialCopyInfo), nameof(src.B));
-
-			dst.A.Should().Be(1);
-			dst.B.Should().Be(0);
-			dst.Other.Should().BeNull();
-		}
-
-		[TestMethod]
-		public void ReadFrom_ForInheritedClasses_Test()
-		{
-			var it0 = new CopyObjInfo() { A = 1, Other = "it0" };
-			var it1 = new CopyObjInfoChild();
-
-			it1.ReadFrom(it0);
-
-			it1.A.Should().Be(1);
-			it1.Other.Should().Be("it0");
-			it1.B.Should().Be(0);
-		}
 	}
 
 	interface ICopyInfo
@@ -346,5 +399,55 @@ namespace Utilities.Dto.Tests
 		public int B { get; set; }
 		public int C { get; set; }
 		public string Other { get; set; }
+	}
+
+	class TmplCopy<T>
+	{
+		public T A { get; set; }
+	}
+
+	class OtherTmplCopy<T>
+	{
+		public T A { get; set; }
+	}
+
+	class MyItem
+	{
+		public int A { get; set; }
+
+		public static explicit operator MyItem(int src)
+		{
+			return new MyItem() { A = src };
+		}
+
+		public static explicit operator int(MyItem src)
+		{
+			return src.A;
+		}
+	}
+
+	class MyItem_ImpliciteCast
+	{
+		public int A { get; set; }
+
+		public static implicit operator MyItem_ImpliciteCast(int src)
+		{
+			return new MyItem_ImpliciteCast() { A = src };
+		}
+
+		public static implicit operator int(MyItem_ImpliciteCast src)
+		{
+			return src.A;
+		}
+	}
+
+	class MyItem_WithoutCast
+	{
+		public int A { get; set; }
+
+		public static int ToInt(MyItem_WithoutCast t)
+		{
+			return t.A;
+		}
 	}
 }

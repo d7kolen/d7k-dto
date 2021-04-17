@@ -1,7 +1,7 @@
-﻿using d7k.Emit;
-using System;
+﻿using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using d7k.Dto.Emit;
 
 namespace d7k.Dto
 {
@@ -20,7 +20,7 @@ namespace d7k.Dto
 			CreateProperties(factory, dtoType, typeBldr);
 			CreateConstructor(factory, typeBldr);
 
-			m_constructor = typeBldr.CreateType().GetConstructor(new Type[0]);
+			m_constructor = typeBldr.CreateTypeInfo().GetConstructor(new Type[0]);
 		}
 
 		private static void CreateConstructor(EmitTypeFactory factory, TypeBuilder typeBldr)

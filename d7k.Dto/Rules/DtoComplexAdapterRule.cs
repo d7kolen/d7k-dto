@@ -26,7 +26,7 @@ namespace d7k.Dto
 			if (value == null)
 				return null;
 
-			return Factory.ValidateObject(Complex.Cast<T>(value), context);
+			return Factory.ValidateObject(Complex.AsStrongly<T>(value), context);
 		}
 	}
 }

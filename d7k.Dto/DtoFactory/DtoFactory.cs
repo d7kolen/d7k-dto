@@ -1,8 +1,8 @@
-﻿using d7k.Emit;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using d7k.Dto.Emit;
 
 namespace d7k.Dto
 {
@@ -102,9 +102,12 @@ namespace d7k.Dto
 		{
 			foreach (var t in interf.GetProperties())
 			{
-				var tSrcProp = sourceType.GetProperty(t.Name, t.PropertyType);
+				var tSrcProp = sourceType.GetProperty(t.Name);//, t.PropertyType);
 				if (tSrcProp == null)
-					throw new InvalidOperationException($"Source property {t.Name} with type {t.PropertyType.FullName} is not exist in {sourceType.GetType().FullName}.");
+				{
+					throw new InvalidOperationException($"Source property {t.Name} doesn't exist.");
+					//throw new InvalidOperationException($"Source property {t.Name} with type {t.PropertyType.FullName} is not exist in {sourceType.GetType().FullName}.");
+				}
 			}
 		}
 

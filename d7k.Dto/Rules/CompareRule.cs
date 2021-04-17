@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace d7k.Dto
 {
 	public abstract class CompareRule : BaseValidationRule
 	{
+		public bool FixToValue { get; set; }
 		public object Value { get; set; }
 
 		public override ValidationResult Validate(ValidationContext context, ref object value)
@@ -19,7 +19,10 @@ namespace d7k.Dto
 				var resultMessage = Compare((IComparable)value, context.ValuePath, tValue);
 
 				if (resultMessage != null)
-					return new[] { context.Issue(this, $"{nameof(CompareRule)}.{GetType().Name}", $"'{context.ValuePath}' is not greater than {Value}.") }.ToResult();
+					if (FixToValue)
+						value = Value;
+					else
+						return new[] { context.Issue(this, $"{nameof(CompareRule)}.{GetType().Name}", $"'{context.ValuePath}' is not greater than {Value}.") }.ToResult();
 			}
 
 			return null;

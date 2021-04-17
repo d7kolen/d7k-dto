@@ -1,8 +1,7 @@
-﻿using d7k.Utilities.Monads;
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using d7k.Dto.Complex;
+using d7k.Dto.Utilities;
 
 namespace d7k.Dto
 {
@@ -12,24 +11,33 @@ namespace d7k.Dto
 	/// </summary>
 	public class DtoComplex
 	{
-		DtoComplexInitialize m_state = new DtoComplexInitialize();
-		ConcurrentDictionary<Type, ValidationMethodInfo[]> m_validatorsMap = new ConcurrentDictionary<Type, ValidationMethodInfo[]>();
-		CopyCache m_copyCache;
+		DtoComplexState m_state = new DtoComplexState();
+		DtoComplexCache m_copyCache;
+		DtoComplexInvoker m_invoker;
 
-		public DtoComplex()
+		public ValidationRepository ValidationRepository { get; }
+
+		public DtoComplex(ValidationRepository validationRepository = null)
 		{
-			m_copyCache = new CopyCache(m_state.Interfaces, m_state.Converters);
+			m_copyCache = new DtoComplexCache(m_state);
+			m_invoker = new DtoComplexInvoker(m_copyCache, m_state, this);
+
+			ValidationRepository = validationRepository;
+			if (validationRepository == null)
+				ValidationRepository = new ValidationRepository();
+
+			ValidationRepository.SetExtension(typeof(DtoComplex), this);
 		}
 
 		/// <summary>
-		/// Load all Nested Dto STATIC classes containers which has dtoAttributes.<para/>
+		/// Load all Nested Dto STATIC classes containers which have dtoAttributes.<para/>
 		/// Format of nested DTO containers should fit the InitByNestedClasses method format, because the method will load them actually.
-		/// KnowAssemblyTypes parameter will help you upload an assembly which were alredy not uploaded. Never operations will do with them.
+		/// KnowAssemblyTypes parameter will help you upload assemblies which haven't uploaded yet. Never operations will do with them.
 		/// When dtoAttributes parameter will has null value. Then we will use single DtoContainerAttribute for it.
 		/// </summary>
-		public DtoComplex ByNestedClassesWithAttributes(Type[] dtoAttributes = null, Type[] knowAssemblyTypes = null)
+		public DtoComplex ByNestedClassesWithAttributes(Type[] dtoAttributes = null, Type[] knownAssemblyTypes = null)
 		{
-			m_state.ByNestedClassesWithAttributes(dtoAttributes, knowAssemblyTypes);
+			m_state.ByNestedClassesWithAttributes(dtoAttributes, knownAssemblyTypes);
 			return this;
 		}
 
@@ -39,18 +47,7 @@ namespace d7k.Dto
 		/// <para/>
 		/// These nested classes will use as discriptions for copying and validation rule selection.<para/>
 		/// <para/>
-		/// Also the method find methods like these:<para/>
-		/// static void ValidateMethodName(ValidationRuleFactory/<IDtoInterface/> t)<para/>
-		/// static void ValidateMethodName(ValidationRuleFactory/<IDtoInterface/> t, DtoComplex dto)<para/>
-		/// <para/>
-		/// These methods will use for DTO validation<para/>
-		/// <para/>
-		/// Also the Init method try find methods like these:<para/>
-		/// static void ConvertMethodName(TDst dst, TSrc src)<para/>
-		/// static void ConvertMethodName(TDst dst, TSrc src, DtoComplex dto)<para/>
-		/// <para/>
-		/// Validate and Convert methods cannot be generic<para/>
-		/// If TDst is type then it should have a default constructor
+		/// Also the method find methods described for DtoAttributes (DtoCastAttribute, DtoConvertAttribute, DtoValidateAttribute)
 		/// </summary>
 		public void InitByNestedClasses(params Type[] classContainers)
 		{
@@ -59,58 +56,34 @@ namespace d7k.Dto
 
 		public TDst Copy<TDst, TSrc>(TDst dst, TSrc src)
 		{
-			var tDst = GetBaseObject(dst);
-			var tSrc = GetBaseObject(src);
+			var tDst = this.GetDtoAdapterSource(dst);
+			var tSrc = this.GetDtoAdapterSource(src);
 
 			if (tDst.GetType() == tSrc.GetType())
 			{
-				tDst.ReadFrom(tSrc, tSrc.GetType());
+				m_invoker.ForSame(tDst, tSrc);
 				return dst;
 			}
 
-			var copiers = m_copyCache.GetCopingInterfaces(tDst, tSrc);
-			var converters = m_copyCache.GetConverters(tDst, tSrc);
+			m_invoker.ForCopiers(tDst, tSrc, null);
+			m_invoker.ForGenerics(tDst, tSrc, null);
+			m_invoker.ForConverters(tDst, tSrc);
+			m_invoker.ForGenericsConverters(tDst, tSrc, null);
 
-			foreach (var t in copiers)
-				tDst.ReadFrom(tSrc, t);
-
-			foreach (var t in converters)
-			{
-				var adaptedDst = t.GetAdaptedDst(tDst);
-				var adaptedSrc = t.GetSrcAdapter(tSrc);
-
-				t.Invoke(adaptedDst, adaptedSrc, this);
-			}
-
-			return dst;
-		}
-
-		private static object GetBaseObject<TDst>(TDst dst)
-		{
-			if (dst is IDtoAdapter)
-				return ((IDtoAdapter)dst).GetSource();
 			return dst;
 		}
 
 		public TDst Update<TDst, TSrc>(TDst dst, TSrc src, params string[] updationList)
 		{
-			var tDst = GetBaseObject(dst);
-			var tSrc = GetBaseObject(src);
+			var tDst = this.GetDtoAdapterSource(dst);
+			var tSrc = this.GetDtoAdapterSource(src);
 
-			var copiers = m_copyCache.GetCopingInterfaces(tDst, tSrc);
-			var converters = m_copyCache.GetConverters(tDst, tSrc);
+			var tUpdationList = new HashSet<string>().Load(updationList);
 
-			foreach (var t in copiers)
-				tSrc.UpdateTo(tDst, t, updationList);
-
-			foreach (var t in converters)
-			{
-				var adaptedDst = t.GetDtoDst();
-				var adaptedSrc = t.GetSrcAdapter(tSrc);
-				t.Invoke(adaptedDst, adaptedSrc, this);
-
-				adaptedDst.UpdateTo(tDst, t.DstType, updationList);
-			}
+			m_invoker.ForCopiers(tDst, tSrc, tUpdationList);
+			m_invoker.ForGenerics(tDst, tSrc, tUpdationList);
+			m_invoker.ForConverters(tDst, tSrc, tUpdationList);
+			m_invoker.ForGenericsConverters(tDst, tSrc, tUpdationList);
 
 			return dst;
 		}
@@ -120,43 +93,17 @@ namespace d7k.Dto
 			if (sourceType == null)
 				return;
 
-			var methods = GetValidators(sourceType);
+			var methods = m_invoker.GetValidators(sourceType);
 
 			foreach (var t in methods)
 			{
 				var tFactory = Activator.CreateInstance(t.FactoryType, validation.Factory.Repository, validation.Factory.OriginalValue);
 				t.Invoke(tFactory, this);
 
-				var tRule = Activator.CreateInstance(t.ComplexRuleType) as BaseValidationRule;
+				var tRule = Activator.CreateInstance(t.RuleType) as BaseValidationRule;
 				((IComplexAdapterRule)tRule).Init(tFactory, this);
 
 				validation.AddValidator(tRule);
-			}
-		}
-
-		private ValidationMethodInfo[] GetValidators(Type sourceType)
-		{
-			return m_validatorsMap.GetOrAdd(sourceType, tType =>
-			{
-				var validators = new List<ValidationMethodInfo>();
-
-				var allInterfaces = m_copyCache.GetInterfaces(tType);
-
-				var interfValidators = allInterfaces.Union(AllChildTypes(tType))
-					.Select(x => m_state.Validators.Get(x))
-					.Where(x => x != null);
-
-				return interfValidators.ToArray();
-			});
-		}
-
-		private IEnumerable<Type> AllChildTypes(Type type)
-		{
-			yield return type;
-			while (type.BaseType != null)
-			{
-				yield return type.BaseType;
-				type = type.BaseType;
 			}
 		}
 
@@ -165,7 +112,7 @@ namespace d7k.Dto
 			if (obj == null)
 				throw new NullReferenceException("DTO is null.");
 
-			obj = GetSource(obj);
+			obj = this.GetDtoAdapterSource(obj);
 
 			var interf = m_copyCache.GetInterfaces(obj.GetType());
 
@@ -178,11 +125,25 @@ namespace d7k.Dto
 			return default(TRes);
 		}
 
-		public object GetSource(object obj)
+		public TDst CastValue<TDst, TSrc>(TSrc src, out TDst dst)
 		{
-			if (obj is IDtoAdapter)
-				return ((IDtoAdapter)obj).GetSource();
-			return obj;
+			m_invoker.Cast.CastValue(src, out dst);
+			return dst;
+		}
+
+		public ValidationResult Validate<TSource>(TSource source, Action<ValidationRuleFactory<TSource>> init)
+		{
+			return ValidationRepository.Validate(source, init);
+		}
+
+		public TSource Fix<TSource>(TSource source, Action<ValidationRuleFactory<TSource>> init)
+		{
+			return ValidationRepository.Fix(source, init);
+		}
+
+		public TSource FixValue<TSource>(TSource value, string valueName, Action<PathValidation<object, TSource>> init)
+		{
+			return ValidationRepository.FixValue(value, valueName, init);
 		}
 	}
 }

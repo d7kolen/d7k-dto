@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace d7k.Dto
 {
 	public abstract class PathValidation<TSource>
 	{
+		public Guid Id { get; set; }
+
 		public PathValueIndexer<TSource> Indexer { get; private set; }
 
 		public List<BaseValidationRule> Validators { get; set; } = new List<BaseValidationRule>();
@@ -15,8 +18,9 @@ namespace d7k.Dto
 
 		public PathValidation(PathValueIndexer<TSource> indexer, ValidationRuleFactory<TSource> factory)
 		{
+			Id = Guid.NewGuid();
 			Indexer = indexer;
-			Path = indexer?.GeneralPath;
+			Path = indexer?.PathName;
 			Factory = factory;
 		}
 
@@ -46,6 +50,7 @@ namespace d7k.Dto
 		{
 			return new PathValidation<TSource, TProperty>(Indexer, Factory)
 			{
+				Id = Id,
 				Validators = Validators.ToList()
 			};
 		}

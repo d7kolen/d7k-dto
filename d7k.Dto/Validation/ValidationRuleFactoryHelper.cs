@@ -14,12 +14,12 @@
 			return factory.ValidateObject(source, new ValidationContext());
 		}
 
-		public static TSource Fix<TSource>(this ValidationRuleFactory<TSource> factory, TSource sources)
+		public static TSource Fix<TSource>(this ValidationRuleFactory<TSource> factory, TSource source)
 		{
-			factory.ValidateObject(sources, new ValidationContext()).ThrowIssues();
-			factory.Update(sources);
+			factory.ValidateObject(source, new ValidationContext()).ThrowIssues();
+			factory.Update(source);
 
-			return sources;
+			return source;
 		}
 
 		/// <summary>

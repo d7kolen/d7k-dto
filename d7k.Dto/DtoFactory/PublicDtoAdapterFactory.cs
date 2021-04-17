@@ -1,7 +1,7 @@
-﻿using d7k.Emit;
-using System;
+﻿using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using d7k.Dto.Emit;
 
 namespace d7k.Dto
 {
@@ -24,7 +24,7 @@ namespace d7k.Dto
 			CreateConstructor(factory, originalType, typeBldr, sourceProperty);
 			InternalDtoAdapterFactory.CreateIDtoAdapter(factory, typeBldr, sourceProperty);
 
-			m_constructor = typeBldr.CreateType().GetConstructor(new[] { originalType });
+			m_constructor = typeBldr.CreateTypeInfo().GetConstructor(new[] { originalType });
 		}
 
 		private static void CreateConstructor(EmitTypeFactory factory, Type originalType, TypeBuilder typeBldr, PropertyBuilder sourceProperty)
@@ -40,7 +40,7 @@ namespace d7k.Dto
 
 			foreach (var t in adapterType.GetAllInterfaceProperties())
 			{
-				var tProp = originalType.GetProperty(t.Name, t.PropertyType);
+				var tProp = originalType.GetProperty(t.Name);//, t.PropertyType);
 
 				var get = ExecBld.Return(ExecBld.GetProp(tProp, getSource));
 				var set = ExecBld.Return(ExecBld.SetProp(tProp, getSource, ExecBld.GetArg(1)));

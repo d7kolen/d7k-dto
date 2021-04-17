@@ -1,4 +1,4 @@
-﻿using d7k.Emit;
+﻿using d7k.Dto.Emit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +30,7 @@ namespace d7k.Dto
 			CreateConstructor(factory, originalType, typeBldr, sourceProperty, factoryProperty);
 			InternalDtoAdapterFactory.CreateIDtoAdapter(factory, typeBldr, sourceProperty);
 
-			m_constructor = typeBldr.CreateType().GetConstructor(new[] { originalType, typeof(AnonymousDtoAdapterFactory) });
+			m_constructor = typeBldr.CreateTypeInfo().GetConstructor(new[] { originalType, typeof(AnonymousDtoAdapterFactory) });
 		}
 
 		private static void CreateConstructor(EmitTypeFactory factory, Type originalType, TypeBuilder typeBldr, PropertyBuilder sourceProperty, PropertyBuilder factoryProperty)
@@ -84,7 +84,7 @@ namespace d7k.Dto
 
 			return originalType
 				.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
-				.FirstOrDefault(f => f.Name == backFieldName && f.FieldType == property.PropertyType);
+				.FirstOrDefault(f => f.Name == backFieldName /* && InternalDtoAdapterFactory.IsInherited(property.PropertyType, f.FieldType)*/);
 		}
 
 		public object GetValue(object source, int index)
@@ -101,5 +101,17 @@ namespace d7k.Dto
 		{
 			return m_constructor.Invoke(new[] { source, this });
 		}
+
+		//static bool IsInherited(Type returnType, Type originType)
+		//{
+		//	return
+		//		originType == returnType ||
+		//		returnType.IsSubclassOf(originType) ||
+		//		(
+		//			returnType.IsInterface &&
+		//			originType.GetInterfaces().Contains(returnType)
+		//		);
+		//	//return originType == returnType;
+		//}
 	}
 }

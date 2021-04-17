@@ -2,43 +2,9 @@
 
 namespace d7k.Dto
 {
-	/// <summary>
-	/// Default DTO container. Owner class should be STATIC.
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Class)]
-	public class DtoContainerAttribute : Attribute
-	{
-		Type[] m_knownTypes = new Type[0];
-
-		public DtoContainerAttribute()
-		{
-		}
-
-		public DtoContainerAttribute(params Type[] knownTypes)
-		{
-			m_knownTypes = knownTypes;
-		}
-	}
-
-	/// <summary>
-	/// Available signatures:<para/>
-	/// static void Validate(ValidationRuleFactory&lt;TSrc&gt; t)<para/>
-	/// static void Validate(ValidationRuleFactory&lt;TSrc&gt; t, DtoComplex dto)
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class DtoValidateAttribute : Attribute { }
-
-	/// <summary>
-	/// Available signatures:<para/>
-	/// static void Convert(TDst dst, TSrc src)<para/>
-	/// static void Convert(TDst dst, TSrc src, DtoComplex dto)
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class DtoConvertAttribute : Attribute { }
-
 	public static class DtoComplexHelper
 	{
-		public static TRes Cast<TRes>(this DtoComplex complex, object obj)
+		public static TRes AsStrongly<TRes>(this DtoComplex complex, object obj)
 		{
 			var result = complex.As<TRes>(obj);
 			if (result == null)
@@ -51,6 +17,18 @@ namespace d7k.Dto
 		{
 			source.InitByNestedClasses(classContainers);
 			return source;
+		}
+
+		public static object GetDtoAdapterSource(this DtoComplex complex, object obj)
+		{
+			if (obj is IDtoAdapter)
+				return ((IDtoAdapter)obj).GetSource();
+			return obj;
+		}
+
+		public static TDst CopyFrom<TDst, TSrc>(this TDst dst, TSrc src, DtoComplex complex)
+		{
+			return complex.Copy(dst, src);
 		}
 	}
 }

@@ -29,7 +29,7 @@ namespace d7k.Dto
 
 		private static string FullTypeName(Type type)
 		{
-			var typeName = type.FullName;
+			var typeName = type.FullName ?? $"{type.Namespace}.{type.DeclaringType.Name}.{type.Name}";
 
 			if (type.IsGenericType)
 			{

@@ -24,8 +24,10 @@ namespace d7k.Dto.Tests
 		public decimal? PriceRubGram { get; set; }
 		public decimal? Percent { get; set; }
 		public decimal? Sum { get; set; }
+		public decimal NotNullableSum { get; set; }
 		public string Comment { get; set; }
 		public byte[] Timestamp { get; set; }
+		public List<byte> List { get; set; }
 
 		public int? ProductTypeId { get; set; }
 		public int? ExchangeHouseId { get; set; }

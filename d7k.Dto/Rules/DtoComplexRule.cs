@@ -16,7 +16,7 @@ namespace d7k.Dto
 			if (value == null)
 				return null;
 
-			var realType = Complex.GetSource(value).GetType();
+			var realType = Complex.GetDtoAdapterSource(value).GetType();
 
 			var tFactory = m_validationCache.GetOrAdd(realType, tType =>
 			{

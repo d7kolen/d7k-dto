@@ -1,4 +1,4 @@
-﻿using d7k.Utilities.Monads;
+﻿using d7k.Dto.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,20 +10,23 @@ namespace d7k.Dto
 	{
 		public Type ObjectType { get; }
 		public Type PropertiesType { get; }
-
-		Type m_interfType;
+		public Type InterfType { get; }
+		public Type GenericInterfType { get; }
 
 		public DtoCopierProperties(Type objType, Type interfType)
 		{
 			ObjectType = objType;
-			m_interfType = interfType;
+			InterfType = interfType;
+
+			if (InterfType.IsGenericType)
+				GenericInterfType = InterfType.GetGenericTypeDefinition();
 
 			PropertiesType = InitPropertiesType();
 		}
 
 		Type InitPropertiesType()
 		{
-			var typeInterf = ObjectType.FindInterfaces((t, fCrit) => t == m_interfType, null).FirstOrDefault();
+			var typeInterf = ObjectType.FindInterfaces((t, fCrit) => t == InterfType, null).FirstOrDefault();
 
 			return typeInterf ?? ObjectType;
 		}
@@ -32,10 +35,10 @@ namespace d7k.Dto
 		{
 			var typeInterf = InitPropertiesType();
 
-			var allInterf = m_interfType.GetInterfaces().ToList();
-			allInterf.Add(m_interfType);
+			var allInterf = InterfType.GetInterfaces().ToList();
+			allInterf.Add(InterfType);
 
-			if (typeInterf != m_interfType)
+			if (typeInterf != InterfType)
 			{
 				var interfProperties = allInterf.SelectMany(x => x.GetProperties()).ToList();
 				var objProperties = typeInterf.GetProperties().ToDictionary(x => x.Name);
@@ -55,11 +58,6 @@ namespace d7k.Dto
 						errorMessages.Add($"{ObjectType.FullName} hasn't property {t.intP.Name}.");
 						continue;
 					}
-					if (t.intP.PropertyType != t.objP.PropertyType)
-					{
-						errorMessages.Add($"{t.objP.Name} property of {ObjectType.FullName} type should be {t.intP.PropertyType.FullName}.");
-						continue;
-					}
 
 					result.Add(t.objP);
 				}
@@ -70,10 +68,10 @@ namespace d7k.Dto
 				return result;
 			}
 
-			if (m_interfType.IsInterface)
+			if (InterfType.IsInterface)
 				return allInterf.SelectMany(x => ObjectType.GetInterfaceMap(x).InterfaceType.GetProperties());
 			else
-				return m_interfType.GetProperties();
+				return InterfType.GetProperties();
 		}
 	}
 }

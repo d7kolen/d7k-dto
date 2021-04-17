@@ -14,7 +14,7 @@ namespace d7k.Dto.Tests
 		{
 			var value = new { a = 1 };
 			var indexer = PathValueIndexerFactory.Create(value, x => x.a);
-			indexer.GeneralPath.Should().Be(".a");
+			indexer.PathName.Should().Be(".a");
 
 			var pathes = indexer.GetPathes(value).ToList();
 			pathes.Should().HaveCount(1);
@@ -32,7 +32,7 @@ namespace d7k.Dto.Tests
 		{
 			var value = new { a = new { b = 1 } };
 			var indexer = PathValueIndexerFactory.Create(value, x => x.a.b);
-			indexer.GeneralPath.Should().Be(".a.b");
+			indexer.PathName.Should().Be(".a.b");
 
 			var pathes = indexer.GetPathes(value).ToList();
 			pathes.Should().HaveCount(1);
@@ -51,7 +51,7 @@ namespace d7k.Dto.Tests
 		{
 			var value = new { a = new { b = 1 } };
 			var indexer = PathValueIndexerFactory.Create(value, x => x.a.b);
-			indexer.GeneralPath.Should().Be(".a.b");
+			indexer.PathName.Should().Be(".a.b");
 
 			var aProperty = value.GetType()
 				.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
@@ -69,7 +69,28 @@ namespace d7k.Dto.Tests
 		{
 			var value = new { a = new[] { 1, 2 } };
 			var indexer = PathValueIndexerFactory.Create(value, x => x.a.First());
-			indexer.GeneralPath.Should().Be(".a[]");
+			indexer.PathName.Should().Be(".a[]");
+
+			var pathes = indexer.GetPathes(value).ToList();
+			pathes.Should().HaveCount(2);
+			pathes[0].Path.Should().Be(".a[0]");
+			pathes[1].Path.Should().Be(".a[1]");
+
+			pathes[0].GetValue().Should().Be(1);
+			pathes[0].SetValue(3);
+
+			value.a.Should().BeEquivalentTo(new[] { 3, 2 });
+			pathes[0].GetValue().Should().Be(3);
+		}
+
+
+
+		[TestMethod]
+		public void GetIndexedValue_ForArray_ScanAll_Test()
+		{
+			var value = new { a = new[] { 1, 2 } };
+			var indexer = PathValueIndexerFactory.Create(value, x => x.a.ScanAll());
+			indexer.PathName.Should().Be(".a[]");
 
 			var pathes = indexer.GetPathes(value).ToList();
 			pathes.Should().HaveCount(2);
@@ -88,7 +109,7 @@ namespace d7k.Dto.Tests
 		{
 			var value = new[] { new { a = 1 }, new { a = 2 } };
 			var indexer = PathValueIndexerFactory.Create(value, x => x.First().a);
-			indexer.GeneralPath.Should().Be("[].a");
+			indexer.PathName.Should().Be("[].a");
 
 			var pathes = indexer.GetPathes(value).ToList();
 			pathes.Should().HaveCount(2);
@@ -110,7 +131,7 @@ namespace d7k.Dto.Tests
 		{
 			var value = new { a = new[] { new[] { 1 }, new[] { 2 } } };
 			var indexer = PathValueIndexerFactory.Create(value, x => x.a.First().First());
-			indexer.GeneralPath.Should().Be(".a[][]");
+			indexer.PathName.Should().Be(".a[][]");
 
 			var pathes = indexer.GetPathes(value).ToList();
 			pathes.Should().HaveCount(2);
@@ -129,7 +150,7 @@ namespace d7k.Dto.Tests
 		{
 			var value = new[] { 1, 2 };
 			var indexer = PathValueIndexerFactory.Create(value, x => x.First());
-			indexer.GeneralPath.Should().Be("[]");
+			indexer.PathName.Should().Be("[]");
 
 			var pathes = indexer.GetPathes(value).ToList();
 			pathes.Should().HaveCount(2);
@@ -151,7 +172,7 @@ namespace d7k.Dto.Tests
 		{
 			var value = new { a = new List<int>(new[] { 1 }) };
 			var indexer = PathValueIndexerFactory.Create(value, x => x.a.First());
-			indexer.GeneralPath.Should().Be(".a[]");
+			indexer.PathName.Should().Be(".a[]");
 
 			var pathes = indexer.GetPathes(value).ToList();
 			pathes.Should().HaveCount(1);
@@ -170,7 +191,7 @@ namespace d7k.Dto.Tests
 		{
 			var value = new { a = new Dictionary<string, string>() { { "a", "b" }, { "c", "d" } } };
 			var indexer = PathValueIndexerFactory.Create(value, x => x.a.First());
-			indexer.GeneralPath.Should().Be(".a[]");
+			indexer.PathName.Should().Be(".a[]");
 
 			var pathes = indexer.GetPathes(value).ToList();
 			pathes.Should().HaveCount(2);
@@ -193,7 +214,7 @@ namespace d7k.Dto.Tests
 		{
 			var value = new { a = new[] { new { b = 1 } } };
 			var indexer = PathValueIndexerFactory.Create(value, x => x.a.First().b);
-			indexer.GeneralPath.Should().Be(".a[].b");
+			indexer.PathName.Should().Be(".a[].b");
 
 			var pathes = indexer.GetPathes(value).ToList();
 			pathes.Should().HaveCount(1);
@@ -212,7 +233,7 @@ namespace d7k.Dto.Tests
 		{
 			var value = new { a = new[] { new { b = new[] { new { c = 1 } } } } };
 			var indexer = PathValueIndexerFactory.Create(value, x => x.a.First().b.First().c);
-			indexer.GeneralPath.Should().Be(".a[].b[].c");
+			indexer.PathName.Should().Be(".a[].b[].c");
 
 			var pathes = indexer.GetPathes(value).ToList();
 			pathes.Should().HaveCount(1);
@@ -231,7 +252,7 @@ namespace d7k.Dto.Tests
 		{
 			var value = 5;
 			var indexer = PathValueIndexerFactory.Create(value, x => x);
-			indexer.GeneralPath.Should().Be("");
+			indexer.PathName.Should().Be("");
 
 			var pathes = indexer.GetPathes(value).ToList();
 			pathes.Should().HaveCount(1);
