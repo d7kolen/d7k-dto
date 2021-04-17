@@ -92,3 +92,49 @@ static class Dto
 	class Dog_Dto : Dog, IPet{ }
 }
 ```
+
+Вы все также можете определять общие интерфейсы в **DtoContainer**. И **Update** будет принимать эти определения во внимание при реализации копирования выбранных полей.
+
+## Конверторы и обновление
+
+Что, если копирование интерфейсов определоно через функции конверторы. Нам надо скопировать только часть свойств, которыми оперирует конвертор. Да, все также:
+
+```csharp
+static void Main(string[] args)
+{
+	var dto = new DtoComplex().ByNestedClassesWithAttributes();
+
+	var cat = new Cat
+	{
+		Age = 1,
+		Weight = 2
+	};
+
+	var result = dto.Update(new Dog(), cat, new[] { nameof(Dog.Age) });
+	//result.Age == 1;
+	//result.Weight == null;
+}
+
+class Cat
+{
+	public int Age { get; set; }
+	public int Weight { get; set; }
+}
+
+class Dog
+{
+	public string Age { get; set; }
+	public string Weight { get; set; }
+}
+
+[DtoContainer]
+static class Dto
+{
+	[DtoConvert]
+	static void Convert(Dog dst, Cat src)
+	{
+		dst.Age = src.Age.ToString();
+		dst.Weight = src.Weight.ToString();
+	}
+}
+```
