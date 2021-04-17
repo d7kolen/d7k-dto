@@ -63,7 +63,7 @@ class Program
 
 		var result = dto.Update(new Dog(), cat, new[] { nameof(Dog.Age) });
 		//result.Age == 1;
-		//result.Weight == 0;		
+		//result.Weight == 0;
 	}
 }
 
