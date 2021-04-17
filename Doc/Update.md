@@ -46,5 +46,49 @@ class SiameseCat : Cat
 * Свойство Weight не копируется. Его нет в списке на обновление.
 * Свойство Height не копируется. Оно не является родственным для двух объектов, поэтому библиотека не знает откуда для него брать значение.
 
-## Если объекты не имеют общих интерфейсов
+## Если нет общих интерфейсов
 
+```csharp
+class Program
+{
+	static void Main(string[] args)
+	{
+		var dto = new DtoComplex().ByNestedClassesWithAttributes();
+
+		var cat = new Cat
+		{
+			Age = 1,
+			Weight = 2
+		};
+
+		var result = dto.Update(new Dog(), cat, new[] { nameof(Dog.Age) });
+		//result.Age == 1;
+		//result.Weight == 0;		
+	}
+}
+
+class Cat
+{
+	public int Age { get; set; }
+	public int Weight { get; set; }
+}
+
+class Dog
+{
+	public int Age { get; set; }
+	public int Weight { get; set; }
+}
+
+public interface IPet
+{
+	int Age { get; set; }
+	int Weight { get; set; }
+}
+
+[DtoContainer]
+static class Dto
+{
+	class Cat_Dto : Cat, IPet{ }
+	class Dog_Dto : Dog, IPet{ }
+}
+```
