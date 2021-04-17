@@ -54,6 +54,52 @@ static class Dto
 
 ## [Копирование части объекта](Doc/Update.md)
 
+```csharp
+class Program
+{
+	static void Main(string[] args)
+	{
+		var dto = new DtoComplex().ByNestedClassesWithAttributes();
+
+		var cat = new Cat
+		{
+			Age = 1,
+			Weight = 2
+		};
+
+		var result = dto.Update(new Dog(), cat, new[] { nameof(Dog.Age) });
+		//result.Age == 1;
+		//result.Weight == 0;
+	}
+}
+
+class Cat
+{
+	public int Age { get; set; }
+	public int Weight { get; set; }
+}
+
+class Dog
+{
+	public int Age { get; set; }
+	public int Weight { get; set; }
+}
+
+public interface IPet
+{
+	int Age { get; set; }
+	int Weight { get; set; }
+}
+
+[DtoContainer]
+static class Dto
+{
+	class Cat_Dto : Cat, IPet{ }
+	class Dog_Dto : Dog, IPet{ }
+}
+```
+[Интересно?](Doc/Update.md)
+
 ## [Валидация](Doc/Validate.md)
 
 ```csharp
