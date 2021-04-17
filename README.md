@@ -52,8 +52,7 @@ static class Dto
 
 [Интересно?](Doc/Copy.md)
 
-## Копирование части объекта
-????? Только root поля. Метов Update
+## [Копирование части объекта](Doc/Update.md)
 
 ## [Валидация](Doc/Validate.md)
 
