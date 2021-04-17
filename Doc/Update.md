@@ -1,5 +1,7 @@
 # Копирование части объекта
 
+## Простое копирование
+
 ```csharp
 static void Main(string[] args)
 {
@@ -20,3 +22,4 @@ class Cat
 	public int Weight { get; set; }
 }
 ```
+
