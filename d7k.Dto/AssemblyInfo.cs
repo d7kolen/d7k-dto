@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("d7k.Dto")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("The library helps to manage similar DTO types")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("d7k")]
 [assembly: AssemblyProduct("d7k.Dto")]
-[assembly: AssemblyCopyright("Copyright © d7k 2020")]
+[assembly: AssemblyCopyright("Copyright © d7k 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.5.0")]
+[assembly: AssemblyFileVersion("1.0.5.0")]
