@@ -145,5 +145,10 @@ namespace d7k.Dto
 		{
 			return ValidationRepository.FixValue(value, valueName, init);
 		}
+
+		public TSource CreateDto<TSource>()
+		{
+			return DtoFactory.Dto<TSource>();
+		}
 	}
 }
