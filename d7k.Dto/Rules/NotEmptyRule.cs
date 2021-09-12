@@ -94,7 +94,21 @@ namespace d7k.Dto
 
 		private ValidationResult EmptyIssue(ValidationContext context)
 		{
-			return context.Issue(this, nameof(NotEmptyRule), $"'{context.ValuePath}' cannot be empty.").ToResult();
+			return context.Issue(
+				this, nameof(NotEmptyRule), $"'{context.ValuePath}' cannot be empty.",
+				new NotEmptyDescription(context.ValuePath))
+				.ToResult();
+		}
+	}
+
+	public class NotEmptyDescription : IIssueDescription
+	{
+		public string Path { get; set; }
+		public bool Required { get; set; } = true;
+
+		public NotEmptyDescription(string path)
+		{
+			Path = path;
 		}
 	}
 }

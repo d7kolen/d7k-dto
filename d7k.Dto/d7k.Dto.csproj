@@ -1,34 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageIcon>Dto.png</PackageIcon>
-    <RepositoryUrl>https://github.com/d7kolen/d7k-dto</RepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.0.5</Version>
-    <PackageTags>Dto</PackageTags>
-    <Description>
-      The library helps to manage similar DTO types.
-    </Description>
-    <PackageProjectUrl>https://github.com/d7kolen/d7k-dto</PackageProjectUrl>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<PackageIcon>Dto.png</PackageIcon>
+		<RepositoryUrl>https://github.com/d7kolen/d7k-dto</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Version>1.0.7</Version>
+		<PackageTags>Dto</PackageTags>
+		<Description>
+			The library helps to manage similar DTO types.
+		</Description>
+		<PackageProjectUrl>https://github.com/d7kolen/d7k-dto</PackageProjectUrl>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DocumentationFile>C:\Git\d7k\d7k.Dto\d7k.Dto\d7k.Dto.xml</DocumentationFile>
+	</PropertyGroup>
 
 	<ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-  </ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+		<PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Utilities\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Utilities\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="Dto.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="Dto.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>

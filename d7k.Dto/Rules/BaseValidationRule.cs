@@ -14,4 +14,14 @@
 			return null;
 		}
 	}
+
+	public interface IIssueDescription
+	{
+		string Path { get; set; }
+	}
+
+	public class BasicDescription : IIssueDescription
+	{
+		public string Path { get; set; }
+	}
 }

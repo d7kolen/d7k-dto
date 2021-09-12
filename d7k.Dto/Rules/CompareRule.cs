@@ -22,7 +22,17 @@ namespace d7k.Dto
 					if (FixToValue)
 						value = Value;
 					else
-						return new[] { context.Issue(this, $"{nameof(CompareRule)}.{GetType().Name}", $"'{context.ValuePath}' is not greater than {Value}.") }.ToResult();
+					{
+						var description = new BasicDescription() { Path = context.ValuePath };
+
+						var issue = context.Issue(
+							this,
+							$"{nameof(CompareRule)}.{GetType().Name}",
+							$"'{context.ValuePath}' is not greater than {Value}.",
+							description);
+
+						return new[] { issue }.ToResult();
+					}
 			}
 
 			return null;

@@ -1,0 +1,246 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>d7k.Dto</name>
+    </assembly>
+    <members>
+        <member name="T:d7k.Dto.DtoCastAttribute">
+            <summary>
+            The cast method will be used for Generic Type convertions.<para/>
+            Available signatures:<para/>
+            static TDst Cast(TSrc src)
+            </summary>
+        </member>
+        <member name="T:d7k.Dto.DtoContainerAttribute">
+            <summary>
+            Default DTO container. Owner class should be STATIC.
+            </summary>
+        </member>
+        <member name="T:d7k.Dto.DtoConvertAttribute">
+            <summary>
+            Available signatures:<para/>
+            static void Convert(TDst dst, TSrc src)<para/>
+            static void Convert(TDst dst, TSrc src, DtoComplex dto)<para/>
+            static void Convert&lt;TDst0,...,TSrc0,...&gt;(TTempl&lt;TDst0,...&gt; dst, TTempl&lt;TSrc0,...&gt; src)<para/>
+            static void Convert&lt;TDst0,...,TSrc0,...&gt;(TTempl&lt;TDst0,...&gt; dst, TTempl&lt;TSrc0,...&gt; src, DtoComplex dto)<para/>
+            static void Convert&lt;TDst0,...&gt;(TTempl&lt;TDst0,...&gt; dst, TTempl&lt;TSrc0,...&gt; src)<para/>
+            static void Convert&lt;TDst0,...&gt;(TTempl&lt;TDst0,...&gt; dst, TTempl&lt;TSrc0,...&gt; src, DtoComplex dto)<para/>
+            static void Convert&lt;TSrc0,...&gt;(TTempl&lt;TDst0,...&gt; dst, TTempl&lt;TSrc0,...&gt; src)<para/>
+            static void Convert&lt;TSrc0,...&gt;(TTempl&lt;TDst0,...&gt; dst, TTempl&lt;TSrc0,...&gt; src, DtoComplex dto)<para/>
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.DtoConvertFilterAttribute.#ctor(System.Type[])">
+            <summary>
+            Empty availableTemplateTypes means any Generic parameter set is available.
+            </summary>
+        </member>
+        <member name="T:d7k.Dto.DtoValidateAttribute">
+            <summary>
+            Available signatures:<para/>
+            static void Validate(ValidationRuleFactory&lt;TSrc&gt; t)<para/>
+            static void Validate(ValidationRuleFactory&lt;TSrc&gt; t, DtoComplex dto)<para/>
+            Can have generic signature:<para/>
+            static void Validate&lt;T&gt;(ValidationRuleFactory&lt;TSrc&lt;T&gt;&gt; t)<para/>
+            </summary>
+        </member>
+        <member name="T:d7k.Dto.DtoComplex">
+            <summary>
+            Complex of Descriptions, Validators, Converters for helping to work with DTO structures.
+            <seealso cref="M:d7k.Dto.DtoComplex.InitByNestedClasses(System.Type[])"/>
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.DtoComplex.ByNestedClassesWithAttributes(System.Type[],System.Type[])">
+            <summary>
+            Load all Nested Dto STATIC classes containers which have dtoAttributes.<para/>
+            Format of nested DTO containers should fit the InitByNestedClasses method format, because the method will load them actually.
+            KnowAssemblyTypes parameter will help you upload assemblies which haven't uploaded yet. Never operations will do with them.
+            When dtoAttributes parameter will has null value. Then we will use single DtoContainerAttribute for it.
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.DtoComplex.InitByNestedClasses(System.Type[])">
+            <summary>
+            Find all types like this:<para/>
+            class TChildClass : TBaseClass, IDtoInterface0, IDtoInterface1 { }<para/>
+            <para/>
+            These nested classes will use as discriptions for copying and validation rule selection.<para/>
+            <para/>
+            Also the method find methods described for DtoAttributes (DtoCastAttribute, DtoConvertAttribute, DtoValidateAttribute)
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.DtoComplexState.ByNestedClassesWithAttributes(System.Type[],System.Type[])">
+            <summary>
+            Load all Nested Dto STATIC classes containers which have dtoAttributes.<para/>
+            Format of nested DTO containers should fit the InitByNestedClasses method format, because the method will load them actually.
+            KnownAssemblyTypes parameter will help you upload assemblies which haven't uploaded yet. Never operations will do with them.
+            When dtoAttributes parameter will has null value. Then we will use single DtoContainerAttribute for it.
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.DtoComplexState.InitByNestedClasses(System.Type[])">
+            <summary>
+            Find all types like this:<para/>
+            class TChildClass : TBaseClass, IDtoInterface0, IDtoInterface1 { }<para/>
+            <para/>
+            These nested classes will use as discriptions for copying and validation rule selection.<para/>
+            <para/>
+            Also the method find methods described for DtoAttributes (DtoCastAttribute, DtoConvertAttribute, DtoValidateAttribute)
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.DtoCopier.GetCopyDelegate(System.Type,System.Type,System.Type,System.Type,System.Boolean)">
+            <summary>
+            Prepare a delegate which has method signature: void CopyMethod(DstType dst, SrcType src, HashSet/<string/> properties)<para/>
+            The delegate can take properties NULL value. In the case it will do full copy.
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.DtoCopierCastStorage.Append(System.Reflection.MethodInfo,System.Type[])">
+            <summary>
+            Signature:<para/>
+            static T1 Cast(T0 src)<para/>
+            static T1 Cast&lt;T0,T1&gt;(T0 src)<para/>
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.PathValueIndexer`1.Create``1(d7k.Dto.IPath{`0})">
+            <summary>
+            Please use First() for value indexing
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.Complex``3(d7k.Dto.PathValidation{``0,``1},System.Action{d7k.Dto.ValidationRuleFactory{``2}})">
+            <summary>
+            getDtoType function will call never. We use the function for the TDtoResult type calculation only.
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.Cast``3(d7k.Dto.PathValidation{``0,``1},System.Func{``1,``2})">
+            <summary>
+            Don't forget to restore TProperty typr before validation finish.
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.NewEra``1(d7k.Dto.PathValidation{``0,System.DateTime})">
+            <summary>
+            Validate that value greate then 1900-01-01
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.NewEra``1(d7k.Dto.PathValidation{``0,System.Nullable{System.DateTime}})">
+            <summary>
+            Validate that value greate then 1900-01-01
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.NewEra``1(d7k.Dto.PathValidation{``0,System.DateTimeOffset})">
+            <summary>
+            Validate that value greate then 1900-01-01
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.NewEra``1(d7k.Dto.PathValidation{``0,System.Nullable{System.DateTimeOffset}})">
+            <summary>
+            Validate that value greate then 1900-01-01
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixEarlierNow``1(d7k.Dto.PathValidation{``0,System.DateTime})">
+            <summary>
+            Set DateTime.UtcNow if a value earlear that UtcNow
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixEarlierNow``1(d7k.Dto.PathValidation{``0,System.DateTimeOffset})">
+            <summary>
+            Set DateTime.UtcNow if a value earlear that UtcNow
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixEarlierNow``1(d7k.Dto.PathValidation{``0,System.Nullable{System.DateTime}})">
+            <summary>
+            Set DateTime.UtcNow if a value earlear that UtcNow
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixEarlierNow``1(d7k.Dto.PathValidation{``0,System.Nullable{System.DateTimeOffset}})">
+            <summary>
+            Set DateTime.UtcNow if a value earlear that UtcNow
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixLaterNow``1(d7k.Dto.PathValidation{``0,System.DateTime})">
+            <summary>
+            Set DateTime.UtcNow if a value later that UtcNow
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixLaterNow``1(d7k.Dto.PathValidation{``0,System.DateTimeOffset})">
+            <summary>
+            Set DateTime.UtcNow if a value later that UtcNow
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixLaterNow``1(d7k.Dto.PathValidation{``0,System.Nullable{System.DateTime}})">
+            <summary>
+            Set DateTime.UtcNow if a value later that UtcNow
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixLaterNow``1(d7k.Dto.PathValidation{``0,System.Nullable{System.DateTimeOffset}})">
+            <summary>
+            Set DateTime.UtcNow if a value later that UtcNow
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.NotEmpty``2(d7k.Dto.PathValidation{``0,``1})">
+            <summary>
+            Check field on Empty.<para/>
+            Collection with 0 length are mean Empty too. If the behavier is undesirable then please look for FixEmpty or Trim rules.
+            They can determine a preferable result for NULL value.<para/>
+            0 value of int, double, decimal, bool(false) and etc base types are not Empty values.
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixEmpty``2(d7k.Dto.PathValidation{``0,``1},System.Func{``1})">
+            <summary>
+            Set specific value if the field has default(TResult)
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixEmpty``2(d7k.Dto.PathValidation{``0,``1},``1)">
+            <summary>
+            Set specific value if the field has default(TResult)
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixEmpty``2(d7k.Dto.PathValidation{``0,``1})">
+            <summary>
+            Set specific value if the field has default(TResult)
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.Trim``1(d7k.Dto.PathValidation{``0,System.String})">
+            <summary>
+            Remove opening and finishing invisible chars from string. Empty string will be transformed to NULL.
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.Trim``2(d7k.Dto.PathValidation{``0,``1})">
+            <summary>
+            Enumeration value will check on 0 size. In the case the value will transform to NULL.
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.SkipEmpty``2(d7k.Dto.PathValidation{``0,``1})">
+            <summary>
+            Removed all Empty values from collection field
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixLesser``2(d7k.Dto.PathValidation{``0,``1},``1)">
+            <summary>
+            Correct value to min value if a value lesser then the min value
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.RuleFactory.FixGreater``2(d7k.Dto.PathValidation{``0,``1},``1)">
+            <summary>
+            Correct value to max value if a value greater then the max value
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.PathValidationExpression.ScanAll``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Method for path validation IEnumerable. Don't call it!
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:d7k.Dto.ValidationResult.Update">
+            <summary>
+            The update is not equivalent of Fix methods. Fix method will make to update at once, but the method will aggregate all updates and after that will do them.
+            So in case when updater want to use already changed data (e.g. SkipEmpty) you need to use Fix functions
+            </summary>
+        </member>
+        <member name="M:d7k.Dto.ValidationRuleFactoryHelper.Example``1(d7k.Dto.ValidationRuleFactory{``0})">
+            <summary>
+            The method return example of TSource type. Be carefull, it has NULL or other empty value (i.e. 0).
+            The method usefull when Validation signature need to have type but C# compiler cannot calculate it automatically.
+            So several method request example parameters which use only as C# type hints (without any using).
+            </summary>
+        </member>
+    </members>
+</doc>

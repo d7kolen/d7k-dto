@@ -11,14 +11,16 @@ namespace d7k.Dto
 		public object CheckValue { get; set; }
 		public string Code { get; set; }
 		public string Message { get; set; }
+		public IIssueDescription Description { get; set; }
 
-		public ValidationIssue(BaseValidationRule validator, string valuePath, object checkValue, string code, string message)
+		public ValidationIssue(BaseValidationRule validator, string valuePath, object checkValue, string code, string message, IIssueDescription description)
 		{
 			Validator = validator;
 			ValuePath = valuePath;
 			CheckValue = checkValue;
 			Code = code;
 			Message = message;
+			Description = description;
 		}
 	}
 
@@ -31,7 +33,7 @@ namespace d7k.Dto
 		public virtual ValidationResult ThrowIssues()
 		{
 			if (Issues.Any())
-				throw new ValidationException(string.Join(Environment.NewLine, Issues.Select(x => x.Message)));
+				throw new ValidationException(Issues);
 
 			return this;
 		}
@@ -41,7 +43,7 @@ namespace d7k.Dto
 			m_updates.Add(() => path.SetValue(value));
 			return this;
 		}
-		
+
 		public ValidationResult Load(ValidationResult otherResult)
 		{
 			if (otherResult == null)
@@ -83,9 +85,17 @@ namespace d7k.Dto
 
 	public class ValidationException : Exception
 	{
+		public List<ValidationIssue> Issues { get; set; }
+
 		public ValidationException(string message)
 			: base(message)
 		{
+		}
+
+		public ValidationException(List<ValidationIssue> issues)
+			: base(string.Join(Environment.NewLine, issues.Select(x => x.Message)))
+		{
+			Issues = issues;
 		}
 	}
 }

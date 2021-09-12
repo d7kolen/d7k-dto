@@ -21,19 +21,24 @@ namespace d7k.Dto
 		{
 		}
 
+		public ValidationIssue Issue(BaseValidationRule validator, string code, string message, IIssueDescription description)
+		{
+			return new ValidationIssue(validator, ValuePath, OriginValue, code, message, description);
+		}
+
 		public ValidationIssue Issue(BaseValidationRule validator, string code, string message)
 		{
-			return new ValidationIssue(validator, ValuePath, OriginValue, code, message);
+			return new ValidationIssue(validator, ValuePath, OriginValue, code, message, null);
 		}
 
 		public ValidationIssue Issue(string code, string message)
 		{
-			return new ValidationIssue(null, ValuePath, OriginValue, code, message);
+			return new ValidationIssue(null, ValuePath, OriginValue, code, message, null);
 		}
 
 		public ValidationIssue Issue(string message)
 		{
-			return new ValidationIssue(null, ValuePath, OriginValue, null, message);
+			return new ValidationIssue(null, ValuePath, OriginValue, null, message, null);
 		}
 
 		public ValidationContext SubPath(string path, object value)
