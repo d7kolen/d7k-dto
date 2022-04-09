@@ -49,33 +49,15 @@
             <seealso cref="M:d7k.Dto.DtoComplex.InitByNestedClasses(System.Type[])"/>
             </summary>
         </member>
-        <member name="M:d7k.Dto.DtoComplex.ByNestedClassesWithAttributes(System.Type[],System.Type[])">
+        <member name="M:d7k.Dto.DtoComplex.ByNestedClassesWithAttributes(System.Type[],System.Type[],System.Boolean)">
             <summary>
             Load all Nested Dto STATIC classes containers which have dtoAttributes.<para/>
             Format of nested DTO containers should fit the InitByNestedClasses method format, because the method will load them actually.
-            KnowAssemblyTypes parameter will help you upload assemblies which haven't uploaded yet. Never operations will do with them.
+            knownAssemblyTypes parameter will help you upload assemblies which haven't uploaded yet. Never operations will do with them.
             When dtoAttributes parameter will has null value. Then we will use single DtoContainerAttribute for it.
             </summary>
         </member>
         <member name="M:d7k.Dto.DtoComplex.InitByNestedClasses(System.Type[])">
-            <summary>
-            Find all types like this:<para/>
-            class TChildClass : TBaseClass, IDtoInterface0, IDtoInterface1 { }<para/>
-            <para/>
-            These nested classes will use as discriptions for copying and validation rule selection.<para/>
-            <para/>
-            Also the method find methods described for DtoAttributes (DtoCastAttribute, DtoConvertAttribute, DtoValidateAttribute)
-            </summary>
-        </member>
-        <member name="M:d7k.Dto.DtoComplexState.ByNestedClassesWithAttributes(System.Type[],System.Type[])">
-            <summary>
-            Load all Nested Dto STATIC classes containers which have dtoAttributes.<para/>
-            Format of nested DTO containers should fit the InitByNestedClasses method format, because the method will load them actually.
-            KnownAssemblyTypes parameter will help you upload assemblies which haven't uploaded yet. Never operations will do with them.
-            When dtoAttributes parameter will has null value. Then we will use single DtoContainerAttribute for it.
-            </summary>
-        </member>
-        <member name="M:d7k.Dto.DtoComplexState.InitByNestedClasses(System.Type[])">
             <summary>
             Find all types like this:<para/>
             class TChildClass : TBaseClass, IDtoInterface0, IDtoInterface1 { }<para/>

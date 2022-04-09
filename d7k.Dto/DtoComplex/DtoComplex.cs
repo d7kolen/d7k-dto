@@ -32,12 +32,14 @@ namespace d7k.Dto
 		/// <summary>
 		/// Load all Nested Dto STATIC classes containers which have dtoAttributes.<para/>
 		/// Format of nested DTO containers should fit the InitByNestedClasses method format, because the method will load them actually.
-		/// KnowAssemblyTypes parameter will help you upload assemblies which haven't uploaded yet. Never operations will do with them.
+		/// knownAssemblyTypes parameter will help you upload assemblies which haven't uploaded yet. Never operations will do with them.
 		/// When dtoAttributes parameter will has null value. Then we will use single DtoContainerAttribute for it.
 		/// </summary>
-		public DtoComplex ByNestedClassesWithAttributes(Type[] dtoAttributes = null, Type[] knownAssemblyTypes = null)
+		public DtoComplex ByNestedClassesWithAttributes(Type[] dtoAttributes = null, Type[] knownAssemblyTypes = null, bool debugLog = false)
 		{
-			m_state.ByNestedClassesWithAttributes(dtoAttributes, knownAssemblyTypes);
+			var log = debugLog ? (IDebugLog)new DebugLogConsole("d7k.Dto") : new DebugLogStub();
+
+			m_state.ByNestedClassesWithAttributes(log, dtoAttributes);
 			return this;
 		}
 

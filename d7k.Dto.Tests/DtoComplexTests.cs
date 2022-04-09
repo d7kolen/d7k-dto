@@ -12,53 +12,6 @@ namespace d7k.Dto.Tests
 	[TestClass]
 	public class DtoComplexTests
 	{
-		#region Additional test attributes
-
-		//public NestedDtoCopierTests()
-		//{
-		//	//
-		//	// TODO: Add constructor logic here
-		//	//
-		//}
-		//
-		//private TestContext testContextInstance;
-		//
-		///// <summary>
-		/////Gets or sets the test context which provides
-		/////information about and functionality for the current test run.
-		/////</summary>
-		//public TestContext TestContext
-		//{
-		//	get
-		//	{
-		//		return testContextInstance;
-		//	}
-		//	set
-		//	{
-		//		testContextInstance = value;
-		//	}
-		//}
-		//
-		// You can use the following additional attributes as you write your tests:
-		//
-		// Use ClassInitialize to run code before running the first test in the class
-		// [ClassInitialize()]
-		// public static void MyClassInitialize(TestContext testContext) { }
-		//
-		// Use ClassCleanup to run code after all tests in a class have run
-		// [ClassCleanup()]
-		// public static void MyClassCleanup() { }
-		//
-		// Use TestInitialize to run code before running each test 
-		// [TestInitialize()]
-		// public void MyTestInitialize() { }
-		//
-		// Use TestCleanup to run code after each test has run
-		// [TestCleanup()]
-		// public void MyTestCleanup() { }
-		//
-		#endregion
-
 		[TestMethod]
 		public void Copy_Test()
 		{
@@ -554,6 +507,18 @@ namespace d7k.Dto.Tests
 		}
 
 		[TestMethod]
+		public void ClassConvert_WithOtherMethod_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(ClassConvert_WithOtherMethod));
+
+			var src = new CopyClass0() { A = 1 };
+			var dst = new CopyClass1();
+
+			dto.Copy(dst, src);
+			dst.B.Should().Be("1");
+		}
+
+		[TestMethod]
 		public void Copy_SubClasses_Test()
 		{
 			var dto = new DtoComplex();
@@ -619,6 +584,20 @@ namespace d7k.Dto.Tests
 		public void BaseClassValidation_Validate_Test()
 		{
 			var dto = new DtoComplex().ByNestedClasses(typeof(BaseClassValidation));
+
+			var obj = new BaseClassValidationChild() { A = -1 };
+			var issues = dto.Validate((object)obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
+			issues.Should().HaveCount(1);
+
+			obj = new BaseClassValidationChild() { A = 1 };
+			issues = dto.Validate((object)obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
+			issues.Should().HaveCount(0);
+		}
+
+		[TestMethod]
+		public void ClassValidation_Validate_WithOtherMethod_Test()
+		{
+			var dto = new DtoComplex().ByNestedClasses(typeof(ClassValidation_WithOtherMethods));
 
 			var obj = new BaseClassValidationChild() { A = -1 };
 			var issues = dto.Validate((object)obj, x => x.RuleFor(t => t).ValidateDto()).Issues;
@@ -788,6 +767,15 @@ namespace d7k.Dto.Tests
 
 	public class CopyClass1_WithInterf : CopyClass1, ICopyClass0, ICopyClass1 { }
 
+
+	[Dto]
+	[DtoContainer]
+	public class NestedCopierContainer2
+	{
+		public class CopyClass0Ext : CopyClass0, ICopyClass0 { }
+
+	}
+
 	[Dto]
 	[DtoContainer]
 	public static class NestedCopierContainer0
@@ -838,6 +826,23 @@ namespace d7k.Dto.Tests
 
 		[DtoConvert]
 		static void Convert(ICopyClass1 dst, ICopyClass0 src)
+		{
+			dst.B = src.A.ToString();
+		}
+	}
+
+	public class ClassConvert_WithOtherMethod
+	{
+		class CopyClass0Ext : CopyClass0, ICopyClass0 { }
+		class CopyClass1Ext : CopyClass1, ICopyClass1 { }
+
+		[DtoConvert]
+		static void Convert(ICopyClass1 dst, ICopyClass0 src)
+		{
+			OtherMethod(dst, src);
+		}
+
+		private static void OtherMethod(ICopyClass1 dst, ICopyClass0 src)
 		{
 			dst.B = src.A.ToString();
 		}
@@ -1328,6 +1333,27 @@ namespace d7k.Dto.Tests
 
 		[DtoValidate]
 		static void Validate(ValidationRuleFactory<IInterf> fact)
+		{
+			fact.RuleFor(x => x.A).Greater(0);
+		}
+
+		class MyA : BaseClassValidationParent, IInterf { }
+	}
+
+	public class ClassValidation_WithOtherMethods
+	{
+		public interface IInterf
+		{
+			int A { get; set; }
+		}
+
+		[DtoValidate]
+		static void Validate(ValidationRuleFactory<IInterf> fact)
+		{
+			OtherMethod(fact);
+		}
+
+		static void OtherMethod(ValidationRuleFactory<IInterf> fact)
 		{
 			fact.RuleFor(x => x.A).Greater(0);
 		}

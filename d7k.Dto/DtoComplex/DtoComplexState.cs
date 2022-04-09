@@ -17,13 +17,7 @@ namespace d7k.Dto
 		public Dictionary<string, ValidationMethodInfo> GenericValidators { get; } = new Dictionary<string, ValidationMethodInfo>();
 		public DtoCopierCastStorage Casts { get; } = new DtoCopierCastStorage();
 
-		/// <summary>
-		/// Load all Nested Dto STATIC classes containers which have dtoAttributes.<para/>
-		/// Format of nested DTO containers should fit the InitByNestedClasses method format, because the method will load them actually.
-		/// KnownAssemblyTypes parameter will help you upload assemblies which haven't uploaded yet. Never operations will do with them.
-		/// When dtoAttributes parameter will has null value. Then we will use single DtoContainerAttribute for it.
-		/// </summary>
-		public void ByNestedClassesWithAttributes(Type[] dtoAttributes = null, Type[] knownAssemblyTypes = null)
+		public void ByNestedClassesWithAttributes(IDebugLog debugLog, Type[] dtoAttributes = null)
 		{
 			if (dtoAttributes == null)
 				dtoAttributes = new[] { typeof(DtoContainerAttribute) };
@@ -45,20 +39,23 @@ namespace d7k.Dto
 					try
 					{
 						foreach (var tType in tAssembly.GetTypes())
-							if (
-								tType.GetCustomAttributes().Where(x => attributesHash.Contains(x.GetType())).Any()
-								&&
-								tType.IsClass
-								&&
-								//static class components
-								tType.IsSealed
-								&&
-								tType.IsAbstract)
+							if (tType.IsClass && tType.GetCustomAttributes().Where(x => attributesHash.Contains(x.GetType())).Any())
 							{
+								if (!(tType.IsSealed && tType.IsAbstract))
+								{
+									debugLog.Notify($"[{tAssembly.GetName().Name} - {tType.Name}] class is not STATIC. It wasn't added to the DtoComplex.");
+									continue;
+								}
+
 								types.Add(tType);
+
+								debugLog.Notify($"[{tAssembly.GetName().Name} - {tType.Name}] was identified as a container class.");
 							}
 					}
-					catch (ReflectionTypeLoadException e) { }
+					catch (ReflectionTypeLoadException e)
+					{
+						Console.WriteLine($"Loading of [{tAssembly.FullName}] issue: {e}");
+					}
 				}
 
 				if (previousAssemblyCount == scannedAssemblies.Count)
@@ -69,14 +66,6 @@ namespace d7k.Dto
 				InitByNestedClasses(types.ToArray());
 		}
 
-		/// <summary>
-		/// Find all types like this:<para/>
-		/// class TChildClass : TBaseClass, IDtoInterface0, IDtoInterface1 { }<para/>
-		/// <para/>
-		/// These nested classes will use as discriptions for copying and validation rule selection.<para/>
-		/// <para/>
-		/// Also the method find methods described for DtoAttributes (DtoCastAttribute, DtoConvertAttribute, DtoValidateAttribute)
-		/// </summary>
 		public void InitByNestedClasses(params Type[] classContainers)
 		{
 			foreach (var tType in classContainers)
