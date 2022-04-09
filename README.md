@@ -1,5 +1,7 @@
 # d7k.Dto
 
+![d7k.Dto](https://api.nuget.org/v3-flatcontainer/d7k.dto/1.0.0/icon)
+
 Библиотека декларативного типизированного управления структурами данных.
 
 Ее рабочая версия может быть найдена в Nuget: https://www.nuget.org/packages/d7k.Dto
