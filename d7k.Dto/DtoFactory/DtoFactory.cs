@@ -8,10 +8,10 @@ namespace d7k.Dto
 {
 	public static class DtoFactory
 	{
-		static EmitTypeFactory s_factory = new EmitTypeFactory(EmitTypeFactory.DynamicModule);
+		static readonly EmitTypeFactory s_factory = new EmitTypeFactory(EmitTypeFactory.DynamicModule);
 
-		static ConcurrentDictionary<string, IDtoAdapterFactory> s_factories = new ConcurrentDictionary<string, IDtoAdapterFactory>();
-		static ConcurrentDictionary<string, PureDtoFactory> s_dtoFactories = new ConcurrentDictionary<string, PureDtoFactory>();
+		static readonly ConcurrentDictionary<string, IDtoAdapterFactory> s_factories = new ConcurrentDictionary<string, IDtoAdapterFactory>();
+		static readonly ConcurrentDictionary<string, PureDtoFactory> s_dtoFactories = new ConcurrentDictionary<string, PureDtoFactory>();
 
 		public static T Dto<T>()
 		{
